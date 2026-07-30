@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-key="userPanelTitle">Smartstorage </title>
+    <link rel="stylesheet" href="panel-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* === HEADER STİLİ === */
+        .panel-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000; 
+            background-color: #fff; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 15px !important;
+            cursor: pointer;
+            height: 100%;
+            text-decoration: none;
+            min-width: 200px;
+        }
+
+        .logo-text {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: flex-start !important;
+            text-align: left !important;
+            line-height: 1.3;
+        }
+
+        .logo-text span:first-child {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2d3436;
+            white-space: nowrap;
+        }
+
+        .logo-text span:last-child {
+            font-size: 13px;
+            color: #636e72;
+            white-space: nowrap;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 50%;
+            background-color: #0984e3;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* === STATISTIKA KARTLARI === */
+        .stat-category-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #f1f2f6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            border-color: #0984e3;
+        }
+        .stat-cat-icon {
+            width: 50px;
+            height: 50px;
+            background: #e3f2fd;
+            color: #0984e3;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .stat-cat-info { text-align: right; }
+        .stat-cat-title { display: block; font-size: 14px; color: #636e72; margin-bottom: 5px; font-weight: 500; }
+        .stat-cat-count { display: block; font-size: 24px; font-weight: bold; color: #2d3436; }
+
+        .stats-container-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            padding: 10px 0;
+        }
+
+        /* === FILTER PANEL === */
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-select {
+            padding: 10px;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fcfcfc;
+            outline: none;
+            cursor: pointer;
+            flex: 1;
+        }
+        .filter-select:focus { border-color: #0984e3; background: #fff; }
+
+        .search-bar {
+            flex: 2;
+            background: #fcfcfc;
+            padding: 0 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #dfe6e9;
+            height: 42px;
+        }
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding-left: 10px;
+            font-size: 14px;
+            background: transparent;
+        }
+        .search-bar i { color: #888; }
+
+        /* === MODAL DÜZƏLİŞLƏRİ === */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white; padding: 30px; border-radius: 16px;
+            width: 90%; max-width: 450px; position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideIn 0.3s ease;
+            max-height: 90vh; overflow-y: auto;
+        }
+        
+        .modal-large { max-width: 800px; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header { margin-bottom: 20px; padding-right: 30px; display: flex; align-items: center; justify-content: space-between; }
+        .modal-header h2 { font-size: 20px; color: #2d3436; margin: 0; }
+
+        .modal-close-btn {
+            background: none; border: none; font-size: 22px; color: #636e72;
+            cursor: pointer; position: absolute; top: 20px; right: 20px;
+            transition: color 0.2s; z-index: 10;
+        }
+        .modal-close-btn:hover { color: #d63031; }
+
+        /* Profile Stili */
+        .profile-pic-wrapper { display: flex; justify-content: center; margin-bottom: 25px; }
+        .profile-pic { width: 100px; height: 100px; border-radius: 50%; background-color: #0984e3; color: white; font-size: 36px; font-weight: bold; display: flex; justify-content: center; align-items: center; position: relative; background-size: cover; background-position: center; border: 4px solid #f1f2f6; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .upload-btn { position: absolute; bottom: 0; right: 0; background: #2d3436; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 14px; border: 2px solid white; }
+        .modal-body .form-group { margin-bottom: 15px; }
+        .modal-body label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 500; color: #636e72; }
+        .modal-body input { width: 100%; padding: 12px; border: 1px solid #dfe6e9; border-radius: 8px; font-size: 14px; background: #fcfcfc; }
+        .modal-body input:focus { border-color: #0984e3; outline: none; background: #fff; }
+        .modal-footer { margin-top: 25px; display: flex; gap: 10px; justify-content: flex-end; }
+        .submit-btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px; justify-content: center; }
+        .btn-primary { background: #0984e3; color: white; }
+        .btn-secondary { background: #dfe6e9; color: #2d3436; }
+        .btn-secondary:hover { background: #b2bec3; }
+        .change-password-btn { width: 100%; margin-top: 10px; background: transparent; border: 1px dashed #b2bec3; color: #636e72; }
+        .change-password-btn:hover { border-color: #0984e3; color: #0984e3; background: #f1faff; }
+
+        /* === ƏTRAFLI MƏLUMAT MODALI === */
+        .details-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
+            background: #f8f9fa; padding: 10px; border-radius: 10px; border: 1px solid #eee;
+        }
+        .detail-item { background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #f1f2f6; }
+        .detail-label { font-size: 11px; text-transform: uppercase; color: #a4b0be; font-weight: bold; margin-bottom: 2px; display: block; }
+        .detail-value { font-size: 14px; color: #2d3436; font-weight: 500; word-break: break-all; }
+        .full-width { grid-column: 1 / -1; }
+
+        /* Göz Düyməsi */
+        .btn-view { 
+            background: #e3f2fd; color: #0984e3; border: none;
+            padding: 8px 12px; border-radius: 6px; cursor: pointer;
+            transition: 0.2s; font-size: 14px;
+        }
+        .btn-view:hover { background: #0984e3; color: white; }
+
+        /* Statistikada açılan detallar */
+        .drilldown-list { list-style: none; padding: 0; margin: 0; }
+        .drilldown-item {
+            background: #fff; border: 1px solid #eee; padding: 15px;
+            margin-bottom: 10px; border-radius: 8px; display: flex;
+            justify-content: space-between; align-items: center;
+            transition: 0.2s; cursor: pointer;
+        }
+        .drilldown-item:hover { border-color: #0984e3; background: #f1faff; }
+        .dd-info h4 { margin: 0 0 5px; font-size: 16px; color: #2d3436; }
+        .dd-info p { margin: 0; font-size: 13px; color: #636e72; }
+        .dd-count {
+            background: #0984e3; color: white; padding: 5px 12px;
+            border-radius: 15px; font-weight: bold; font-size: 14px;
+        }
+        .dd-count.warning { background: #f39c12; }
+        .dd-count.success { background: #00b894; }
+        .dd-count.neutral { background: #636e72; }
+
+        /* Geri düyməsi */
+        .back-btn {
+            background: none; border: none; font-size: 16px; color: #0984e3;
+            cursor: pointer; display: flex; align-items: center; gap: 5px; margin-bottom: 15px;
+        }
+        .back-btn:hover { text-decoration: underline; }
+
+        /* QR Modal */
+        .qr-code-section { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 20px; border-radius: 12px; border: 2px dashed #0984e3; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-qr { background: none; border: none; cursor: pointer; font-size: 15px; margin-right: 5px; color: #2d3436; transition: 0.2s; }
+        .btn-qr:hover { transform: scale(1.2); }
+
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <header class="panel-header">
+            <div class="logo" id="profile-btn"> 
+                <div class="logo-icon user" id="profile-pic-header">IS</div>
+                <div class="logo-text">
+                    <span id="user-name-display" data-key="userWelcome">Anbar İşçisi</span>
+                    <span id="user-email-display" data-key="loading">Yüklənir...</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="lang-switcher" id="lang-btn">
+                    <i class="fas fa-globe"></i>
+                    <span class="lang-btn-text">AZ</span>
+                    <div class="lang-dropdown" id="lang-dropdown">
+                        <a href="#" data-lang="az" data-key="langAzerbaijani">Azərbaycanca (AZ)</a>
+                        <a href="#" data-lang="en" data-key="langEnglish">English (EN)</a>
+                        <a href="#" data-lang="ru" data-key="langRussian">Русский (RU)</a>
+                    </div>
+                </div>
+                <button id="logout-btn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span data-key="logout">Çıxış</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="panel-main">
+            <section class="stat-cards">
+                <div class="card green">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statTotalInventory">Ümumi İnventar</span>
+                        <span class="card-value" id="stat-total">0</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-boxes"></i></div>
+                </div>
+                <div class="card green-light">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statWorking">İşlək</span>
+                        <span class="card-value" id="stat-islek">0</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="card red">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statBroken">Xarab/Təmirdə</span>
+                        <span class="card-value" id="stat-xarab">0</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-tools"></i></div>
+                </div>
+            </section>
+
+            <section class="content-tabs">
+                <div class="tab-nav">
+                    <button class="tab-link active" data-tab="inventory-tab">
+                        <i class="fas fa-list"></i> <span data-key="tabAllInventory">Ümumi İnventar</span>
+                    </button>
+                    <button class="tab-link" data-tab="warehouse-tab">
+                        <i class="fas fa-warehouse"></i> <span data-key="tabWarehouse">Anbar</span>
+                    </button>
+                    <button class="tab-link" data-tab="stats-tab">
+                        <i class="fas fa-chart-pie"></i> <span data-key="tabStatistics">Statistika</span>
+                    </button>
+                </div>
+
+                <div class="tab-content active" id="inventory-tab">
+                    <div class="filter-container">
+                        <div class="filter-group">
+                            <select id="filter-type" class="filter-select">
+                                <option value="" data-key="filterAllTypes">Bütün Növlər</option>
+                                <option value="Kompüter" data-key="formTypeComputer">Kompüter</option>
+                                <option value="Monitor" data-key="formTypeMonitor">Monitor</option>
+                                <option value="Printer" data-key="formTypePrinter">Printer</option>
+                                <option value="Digər" data-key="formTypeOther">Digər</option>
+                            </select>
+                            <select id="filter-status" class="filter-select">
+                                <option value="" data-key="filterAllStatuses">Bütün Statuslar</option>
+                                <option value="İşlək" data-key="formStatusWorking">İşlək</option>
+                                <option value="Xarab" data-key="formStatusBroken">Xarab</option>
+                                <option value="Təmirdə" data-key="formStatusRepair">Təmirdə</option>
+                            </select>
+                        </div>
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="inventory-search" data-key="searchPlaceholder" placeholder="Ad, Sistem ID və ya növ ilə axtar...">
+                        </div>
+                    </div>
+
+                    <div class="list-body">
+                        <table id="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th data-key="thHolder">Ad Soyad</th>
+                                    <th data-key="thFaculty">Fakültə</th>
+                                    <th data-key="thNameModel">Avadanlıq</th>
+                                    <th data-key="thStatus">Status</th>
+                                    <th data-key="thSystemID">Sistem İD</th>
+                                    <th data-key="thOperations">Ətraflı</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-tbody"></tbody>
+                        </table>
+                        <div id="empty-state" class="empty-state" style="display: none;">
+                            <i class="fas fa-box-open"></i>
+                            <h3 data-key="emptyStateInventory">İnventar tapılmadı.</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="warehouse-tab">
+                    <div class="filter-container">
+                        <div class="filter-group">
+                            <select id="wh-filter-type" class="filter-select">
+                                <option value="" data-key="filterAllTypes">Bütün Növlər</option>
+                                <option value="Kompüter" data-key="formTypeComputer">Kompüter</option>
+                                <option value="Monitor" data-key="formTypeMonitor">Monitor</option>
+                                <option value="Printer" data-key="formTypePrinter">Printer</option>
+                                <option value="Digər" data-key="formTypeOther">Digər</option>
+                            </select>
+                            <select id="wh-filter-status" class="filter-select">
+                                <option value="" data-key="filterAllStatuses">Bütün Statuslar</option>
+                                <option value="İşlək" data-key="formStatusWorking">İşlək</option>
+                                <option value="Xarab" data-key="formStatusBroken">Xarab</option>
+                                <option value="Təmirdə" data-key="formStatusRepair">Təmirdə</option>
+                            </select>
+                        </div>
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="wh-search" data-key="searchPlaceholder" placeholder="Ad, Sistem ID və ya növ ilə axtar...">
+                        </div>
+                    </div>
+
+                    <div class="list-body">
+                        <table id="warehouse-table">
+                            <thead>
+                                <tr>
+                                    <th data-key="thHolder">Ad Soyad</th>
+                                    <th data-key="thFaculty">Fakültə</th>
+                                    <th data-key="thNameModel">Avadanlıq</th>
+                                    <th data-key="thStatus">Status</th>
+                                    <th data-key="thSystemID">Sistem İD</th>
+                                    <th data-key="thOperations">Ətraflı</th>
+                                </tr>
+                            </thead>
+                            <tbody id="warehouse-tbody"></tbody>
+                        </table>
+                        <div id="wh-empty-state" class="empty-state" style="display: none;">
+                            <i class="fas fa-warehouse"></i>
+                            <h3 data-key="emptyStateWarehouse">Anbarda heç nə yoxdur.</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="stats-tab">
+                    <div class="stats-container-grid">
+                        <div class="stat-category-card" onclick="openTypeBreakdown('Kompüter')">
+                            <div class="stat-cat-icon"><i class="fas fa-laptop"></i></div>
+                            <div class="stat-cat-info">
+                                <span class="stat-cat-title" data-key="formTypeComputer">Kompüter</span>
+                                <span class="stat-cat-count" id="count-Kompüter">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-category-card" onclick="openTypeBreakdown('Monitor')">
+                            <div class="stat-cat-icon"><i class="fas fa-desktop"></i></div>
+                            <div class="stat-cat-info">
+                                <span class="stat-cat-title" data-key="formTypeMonitor">Monitor</span>
+                                <span class="stat-cat-count" id="count-Monitor">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-category-card" onclick="openTypeBreakdown('Printer')">
+                            <div class="stat-cat-icon"><i class="fas fa-print"></i></div>
+                            <div class="stat-cat-info">
+                                <span class="stat-cat-title" data-key="formTypePrinter">Printer</span>
+                                <span class="stat-cat-count" id="count-Printer">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-category-card" onclick="openTypeBreakdown('Digər')">
+                            <div class="stat-cat-icon"><i class="fas fa-cubes"></i></div>
+                            <div class="stat-cat-info">
+                                <span class="stat-cat-title" data-key="formTypeOther">Digər</span>
+                                <span class="stat-cat-count" id="count-Digər">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="type-breakdown-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="type-breakdown-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 id="breakdown-title">Statistika</h2></div>
+            <div class="modal-body" id="breakdown-body"></div>
+        </div>
+    </div>
+
+    <div id="filtered-list-modal" class="modal-overlay">
+        <div class="modal-content modal-large">
+            <button class="modal-close-btn" id="filtered-list-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <h2 id="filtered-list-title">Siyahı</h2>
+            </div>
+            <div class="modal-body">
+                <button class="back-btn" onclick="backToBreakdown()"><i class="fas fa-arrow-left"></i> <span data-key="backBtn">Geri</span></button>
+                <div class="list-body">
+                    <table id="filtered-list-table">
+                        <thead>
+                            <tr>
+                                <th data-key="thHolder">Sahib / Yeri</th>
+                                <th data-key="thNameModel">Avadanlıq</th>
+                                <th data-key="thSystemID">Sistem ID</th>
+                                <th data-key="thOperations">Ətraflı</th>
+                            </tr>
+                        </thead>
+                        <tbody id="filtered-list-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="item-details-modal" class="modal-overlay" style="z-index: 2200;">
+        <div class="modal-content profile-modal">
+            <button class="modal-close-btn" id="item-details-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 data-key="equipmentDetails">Avadanlıq Məlumatları</h2></div>
+            <div class="modal-body">
+                <div class="details-grid" id="item-details-content"></div>
+                <div id="item-image-container"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submit-btn btn-primary" id="item-details-ok" data-key="okBtn">Oldu</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="modal-overlay">
+        <div class="modal-content profile-modal" style="width: 350px;">
+            <button class="modal-close-btn" onclick="document.getElementById('qr-modal').style.display='none'"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2>QR Kod</h2></div>
+            <div class="modal-body" style="display: flex; flex-direction: column; align-items: center;">
+                <div id="qrcode" class="qr-code-section"></div>
+                <button type="button" class="submit-btn btn-success" onclick="downloadQR()" style="margin-top: 20px; width: 100%;">
+                    <i class="fas fa-download"></i> QR Kodu Yüklə
+                </button>
+                <p id="qr-link-text" style="font-size:10px; word-break:break-all; color:grey; margin-top:5px; text-align:center;"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="modal-overlay">
+        <div class="modal-content profile-modal">
+            <button class="modal-close-btn" id="profile-modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 data-key="profileSettings">Profil Parametrləri</h2></div>
+            <form id="profile-settings-form">
+                <div class="modal-body">
+                    <div class="profile-pic-wrapper">
+                        <div class="profile-pic" id="profile-pic-modal">IS
+                            <label for="profile-pic-upload" class="upload-btn"><i class="fas fa-camera"></i></label>
+                            <input type="file" id="profile-pic-upload" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="form-group"><label data-key="fullNameLabel">Tam ad</label><input type="text" id="profile-name" required></div>
+                    <div class="form-group"><label data-key="emailLabel">E-poçt ünvanı</label><input type="email" id="profile-email" disabled></div>
+                    <button type="button" class="submit-btn btn-secondary change-password-btn" id="change-password-btn-open"><i class="fas fa-lock"></i> <span data-key="changePassword">Şifrəni Dəyiş</span></button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="submit-btn btn-secondary" id="profile-cancel-btn" data-key="cancel">Ləğv et</button>
+                    <button type="submit" class="submit-btn btn-primary" data-key="updateProfile">Profili Yenilə</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="change-password-modal" class="modal-overlay">
+        <div class="modal-content profile-modal" style="width: 400px;">
+            <button class="modal-close-btn" id="password-modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 data-key="changePasswordTitle">Şifrəni Dəyiş</h2></div>
+            <form id="change-password-form">
+                <div class="modal-body">
+                    <div class="form-group"><label data-key="oldPassword">Köhnə şifrə</label><input type="password" id="old-password" required></div>
+                    <div class="form-group"><label data-key="newPassword">Yeni şifrə</label><input type="password" id="new-password" required></div>
+                    <div class="form-group"><label data-key="confirmNewPassword">Yeni şifrəni təsdiqlə</label><input type="password" id="confirm-new-password" required></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="submit-btn btn-secondary" id="password-cancel-btn" data-key="cancel">Ləğv et</button>
+                    <button type="submit" class="submit-btn btn-primary" data-key="changePassword">Şifrəni Dəyiş</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    
+    <script>
+        // === TƏRCÜMƏ SİSTEMİ ===
+        const translations = {
+            az: {
+                userPanelTitle: "Smartstorage Anbar",
+                userWelcome: "Anbar İşçisi",
+                loading: "Yüklənir...",
+                langAzerbaijani: "Azərbaycanca (AZ)",
+                langEnglish: "English (EN)",
+                langRussian: "Русский (RU)",
+                logout: "Çıxış",
+                tabAllInventory: "Ümumi İnventar",
+                tabWarehouse: "Anbar",
+                tabStatistics: "Statistika",
+                searchPlaceholder: "Ad, Sistem ID və ya növ ilə axtar...",
+                thHolder: "Ad Soyad",
+                thFaculty: "Fakültə",
+                thSystemID: "Sistem İD",
+                thNameModel: "Avadanlıq",
+                thStatus: "Status",
+                thOperations: "Ətraflı",
+                emptyStateInventory: "İnventar tapılmadı.",
+                emptyStateWarehouse: "Anbarda heç nə yoxdur.",
+                profileSettings: "Profil Parametrləri",
+                fullNameLabel: "Tam ad",
+                emailLabel: "E-poçt ünvanı",
+                changePassword: "Şifrəni Dəyiş",
+                cancel: "Ləğv et",
+                updateProfile: "Profili Yenilə",
+                changePasswordTitle: "Şifrəni Dəyiş",
+                oldPassword: "Köhnə şifrə",
+                newPassword: "Yeni şifrə",
+                confirmNewPassword: "Yeni şifrəni təsdiqlə",
+                formStatusWorking: "İşlək",
+                formStatusBroken: "Xarab",
+                formStatusRepair: "Təmirdə",
+                profileUpdateSuccess: "Profil yeniləndi!",
+                profileUpdateError: "Xəta: ",
+                pwMismatch: "Şifrələr uyğun gəlmir!",
+                passwordUpdateSuccess: "Şifrə yeniləndi!",
+                reauthError: "Yenidən giriş lazımdır (Köhnə şifrə səhvdir).",
+                weakPassword: "Şifrə çox zəifdir.",
+                passwordUpdateError: "Xəta: ",
+                lblHolderName: "Sahib Adı",
+                lblHolderFaculty: "Fakültə",
+                formName: "Adı",
+                formModel: "Model",
+                formType: "Növü",
+                formStatus: "Status",
+                formSerial: "Serial Nömrə",
+                formMac: "MAC",
+                formDate: "Tarix",
+                formNotes: "Qeyd",
+                equipmentDetails: "Avadanlıq Məlumatları",
+                okBtn: "Oldu",
+                backBtn: "Geri",
+                statTotalInventory: "Ümumi İnventar",
+                statTotal: "Ümumi Say",
+                statWorking: "İşlək",
+                statWarehouse: "Anbarda (Boş)",
+                statBroken: "Xarab/Təmirdə",
+                formTypeComputer: "Kompüter",
+                formTypeMonitor: "Monitor",
+                formTypePrinter: "Printer",
+                formTypeOther: "Digər",
+                filterAllTypes: "Bütün Növlər",
+                filterAllStatuses: "Bütün Statuslar",
+                viewImage: "Şəkilə Bax"
+            },
+            en: {
+                userPanelTitle: "Smartstorage Staff",
+                userWelcome: "Staff",
+                logout: "Logout",
+                tabAllInventory: "General Inventory",
+                tabWarehouse: "Warehouse",
+                tabStatistics: "Statistics",
+                searchPlaceholder: "Search by Name, System ID or Type...",
+                thHolder: "Name Surname",
+                thFaculty: "Faculty",
+                thSystemID: "System ID",
+                thNameModel: "Equipment",
+                thStatus: "Status",
+                thOperations: "Details",
+                emptyStateInventory: "No inventory found.",
+                emptyStateWarehouse: "Warehouse is empty.",
+                formStatusWorking: "Working",
+                formStatusBroken: "Broken",
+                formStatusRepair: "In Repair",
+                lblHolderName: "Holder Name",
+                lblHolderFaculty: "Faculty",
+                formName: "Name",
+                formModel: "Model",
+                formType: "Type",
+                formStatus: "Status",
+                formSerial: "Serial No",
+                formMac: "MAC",
+                formDate: "Date",
+                formNotes: "Notes",
+                equipmentDetails: "Equipment Details",
+                okBtn: "OK",
+                backBtn: "Back",
+                statTotalInventory: "Total Inventory",
+                statTotal: "Total Count",
+                statWorking: "Working",
+                statWarehouse: "In Warehouse",
+                statBroken: "Broken/Repair",
+                formTypeComputer: "Computer",
+                formTypeMonitor: "Monitor",
+                formTypePrinter: "Printer",
+                formTypeOther: "Other",
+                filterAllTypes: "All Types",
+                filterAllStatuses: "All Statuses",
+                viewImage: "View Image"
+            },
+            ru: {
+                userPanelTitle: "Smartstorage Склад",
+                userWelcome: "Сотрудник",
+                logout: "Выход",
+                tabAllInventory: "Общий Инвентарь",
+                tabWarehouse: "Склад",
+                tabStatistics: "Статистика",
+                searchPlaceholder: "Поиск по имени, System ID...",
+                thHolder: "ФИО",
+                thFaculty: "Факультет",
+                thSystemID: "System ID",
+                thNameModel: "Оборудование",
+                thStatus: "Статус",
+                thOperations: "Детали",
+                emptyStateInventory: "Инвентарь не найден.",
+                emptyStateWarehouse: "Склад пуст.",
+                formStatusWorking: "Рабочий",
+                formStatusBroken: "Сломан",
+                formStatusRepair: "В ремонте",
+                lblHolderName: "Владелец",
+                lblHolderFaculty: "Факультет",
+                formName: "Название",
+                formModel: "Модель",
+                formType: "Тип",
+                formStatus: "Статус",
+                formSerial: "Серийный №",
+                formMac: "MAC",
+                formDate: "Дата",
+                formNotes: "Заметки",
+                equipmentDetails: "Детали",
+                okBtn: "ОК",
+                backBtn: "Назад",
+                statTotalInventory: "Всего",
+                statTotal: "Всего",
+                statWorking: "Рабочее",
+                statWarehouse: "На складе",
+                statBroken: "Сломано/Ремонт",
+                formTypeComputer: "Компьютер",
+                formTypeMonitor: "Монитор",
+                formTypePrinter: "Принтер",
+                formTypeOther: "Другое",
+                filterAllTypes: "Все типы",
+                filterAllStatuses: "Все статусы",
+                viewImage: "Посмотреть фото"
+            }
+        };
+
+        let currentLang = localStorage.getItem('appLang') || 'az';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('appLang', lang);
+            
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[lang][key]) {
+                    if (el.tagName === 'INPUT' && el.getAttribute('placeholder')) {
+                        el.placeholder = translations[lang][key];
+                    } else if (el.tagName === 'OPTION') {
+                        el.textContent = translations[lang][key];
+                    } else {
+                        if(el.children.length > 0 && el.querySelector('i')) {
+                             const icon = el.querySelector('i').outerHTML;
+                             el.innerHTML = icon + ' ' + translations[lang][key];
+                        } else {
+                            el.textContent = translations[lang][key];
+                        }
+                    }
+                }
+            });
+
+            const langBtnText = document.querySelector('.lang-btn-text');
+            if(langBtnText) langBtnText.textContent = lang.toUpperCase();
+            const dropdown = document.getElementById('lang-dropdown');
+            if(dropdown) dropdown.classList.remove('show');
+
+            // Hər iki cədvəli yenilə
+            renderGeneralTable();
+            renderWarehouseTable();
+        }
+
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        // === FIREBASE ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyAI2rM3vttKrDI9C4vDD41_hcXurLvQ6gw",
+            authDomain: "it-inventory-tracker-61d2c.firebaseapp.com",
+            projectId: "it-inventory-tracker-61d2c",
+            storageBucket: "it-inventory-tracker-61d2c.firebasestorage.app",
+            messagingSenderId: "557225811726",
+            appId: "1:557225811726:web:f85c3ca033997d2f95c15f"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        let currentUserId = null;
+        let inventoryCache = []; 
+        let currentSelectedType = ''; 
+        let activeTabId = 'inventory-tab'; // Hazırkı aktiv tab
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.collection("users").doc(user.uid).get().then(doc => {
+                    if(doc.exists && doc.data().status === 'deactivated') {
+                        alert("Sizin hesabınız deaktiv edilib.");
+                        auth.signOut();
+                        window.location.href = "index.html";
+                        return;
+                    }
+                    currentUserId = user.uid; 
+                    const userData = doc.data();
+                    const name = userData.name || t('userWelcome');
+                    
+                    document.getElementById('user-email-display').innerText = user.email;
+                    document.getElementById('user-name-display').innerText = name;
+                    document.getElementById('user-email-display').removeAttribute('data-key');
+                    document.getElementById('user-name-display').removeAttribute('data-key');
+                    
+                    document.getElementById('profile-name').value = name;
+                    document.getElementById('profile-email').value = user.email;
+
+                    const initials = name.split(' ').map(n => n[0]).join('').substring(0,2);
+                    const headerPic = document.getElementById('profile-pic-header');
+                    const modalPic = document.getElementById('profile-pic-modal');
+                    
+                    if (userData.profilePicUrl) {
+                        headerPic.style.backgroundImage = `url(${userData.profilePicUrl})`;
+                        headerPic.innerText = '';
+                        modalPic.style.backgroundImage = `url(${userData.profilePicUrl})`;
+                        modalPic.innerText = '';
+                    } else {
+                        headerPic.style.backgroundImage = '';
+                        headerPic.innerText = initials;
+                        modalPic.style.backgroundImage = '';
+                        modalPic.innerText = initials;
+                    }
+
+                    loadAllInventory();
+                    checkUrlForQR();
+                    setLanguage(currentLang);
+                });
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            auth.signOut().then(() => { window.location.href = "index.html"; });
+        });
+
+        // Tabların İdarəsi və Statistika Yenilənməsi
+        const tabLinks = document.querySelectorAll('.tab-nav .tab-link');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                activeTabId = link.getAttribute('data-tab');
+                
+                tabLinks.forEach(item => item.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                link.classList.add('active');
+                document.getElementById(activeTabId).classList.add('active');
+
+                // Tab dəyişəndə cədvəlləri və statistikanı yenilə
+                if(activeTabId === 'inventory-tab') renderGeneralTable();
+                else if(activeTabId === 'warehouse-tab') renderWarehouseTable();
+            });
+        });
+
+        function loadAllInventory() {
+            db.collection("equipment").onSnapshot(snapshot => {
+                inventoryCache = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                // Əlifba sırası
+                inventoryCache.sort((a, b) => {
+                    const nameA = (a.holderName || "").toLowerCase();
+                    const nameB = (b.holderName || "").toLowerCase();
+                    return nameA.localeCompare(nameB);
+                });
+                
+                // Hər iki cədvəli render et
+                renderGeneralTable();
+                renderWarehouseTable();
+                
+                // Statistika tabı üçün countlar
+                updateStatsCounts();
+                checkUrlForQR(); // URL-də QR varsa yoxla
+            });
+        }
+
+        const statusMap = {
+            "İşlək": "formStatusWorking",
+            "Xarab": "formStatusBroken",
+            "Təmirdə": "formStatusRepair",
+            "Working": "formStatusWorking",
+            "Broken": "formStatusBroken",
+            "Repair": "formStatusRepair"
+        };
+        const typeMap = {
+            "Kompüter": "formTypeComputer",
+            "Monitor": "formTypeMonitor",
+            "Printer": "formTypePrinter",
+            "Digər": "formTypeOther",
+            "Computer": "formTypeComputer", "Компьютер": "formTypeComputer" 
+        };
+
+        // --- CƏDVƏL 1: ÜMUMİ İNVENTAR ---
+        function renderGeneralTable() {
+            const tableBody = document.getElementById('inventory-tbody');
+            const emptyState = document.getElementById('empty-state');
+            
+            const searchTerm = document.getElementById('inventory-search').value.toLowerCase();
+            const filterType = document.getElementById('filter-type').value;
+            const filterStatus = document.getElementById('filter-status').value;
+            
+            tableBody.innerHTML = ""; 
+            
+            let filteredList = inventoryCache;
+
+            if (filterType) filteredList = filteredList.filter(item => {
+                let itemType = item.type;
+                if (itemType === "Computer" || itemType === "Компьютер") itemType = "Kompüter";
+                return itemType === filterType;
+            });
+
+            if (filterStatus) filteredList = filteredList.filter(item => item.status === filterStatus);
+
+            if (searchTerm) {
+                filteredList = filteredList.filter(item => {
+                    const statusText = t(statusMap[item.status] || item.status).toLowerCase();
+                    const typeText = t(typeMap[item.type] || item.type).toLowerCase();
+                    const searchStr = [
+                        item.name, item.model, item.serial, item.type, item.holderName, item.holderFaculty,
+                        statusText, typeText, item.systemId
+                    ].join(' ').toLowerCase();
+                    return searchStr.includes(searchTerm);
+                });
+            }
+
+            if (filteredList.length === 0) emptyState.style.display = "block";
+            else emptyState.style.display = "none";
+
+            if (activeTabId === 'inventory-tab') {
+                updateTopCards(filteredList);
+            }
+
+            filteredList.forEach(equip => {
+                let equipStatusText = t(statusMap[equip.status] || equip.status);
+                const row = `
+                    <tr>
+                        <td style="font-weight:bold;">${equip.holderName || '-'}</td>
+                        <td>${equip.holderFaculty || '-'}</td>
+                        <td>${equip.name} <br> <span style="font-size:12px; color:#777;">${equip.model}</span></td>
+                        <td class="status-${equip.status.toLowerCase()}">${equipStatusText}</td>
+                        <td style="color: #636e72; font-family: monospace;">${equip.systemId || 'N/A'}</td>
+                        <td style="text-align: center; display:flex; justify-content:center; gap:5px;">
+                            <button class="btn-qr" onclick="openQRModal('${equip.id}')" title="QR Kod"><i class="fas fa-qrcode"></i></button>
+                            <button class="btn-view" onclick="viewItemDetails('${equip.id}')" title="${t('equipmentDetails')}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // --- CƏDVƏL 2: ANBAR (SADECE ANBARDA OLANLAR) ---
+        function renderWarehouseTable() {
+            const tableBody = document.getElementById('warehouse-tbody');
+            const emptyState = document.getElementById('wh-empty-state');
+            
+            const searchTerm = document.getElementById('wh-search').value.toLowerCase();
+            const filterType = document.getElementById('wh-filter-type').value;
+            const filterStatus = document.getElementById('wh-filter-status').value;
+            
+            tableBody.innerHTML = ""; 
+            
+            // Yalnız Anbarda olanlar
+            let filteredList = inventoryCache.filter(item => !item.holderName || item.holderName === "Anbar");
+
+            if (filterType) filteredList = filteredList.filter(item => {
+                let itemType = item.type;
+                if (itemType === "Computer" || itemType === "Компьютер") itemType = "Kompüter";
+                return itemType === filterType;
+            });
+
+            if (filterStatus) filteredList = filteredList.filter(item => item.status === filterStatus);
+
+            if (searchTerm) {
+                filteredList = filteredList.filter(item => {
+                    const statusText = t(statusMap[item.status] || item.status).toLowerCase();
+                    const typeText = t(typeMap[item.type] || item.type).toLowerCase();
+                    const searchStr = [
+                        item.name, item.model, item.serial, item.type, "anbar",
+                        statusText, typeText, item.systemId
+                    ].join(' ').toLowerCase();
+                    return searchStr.includes(searchTerm);
+                });
+            }
+
+            if (filteredList.length === 0) emptyState.style.display = "block";
+            else emptyState.style.display = "none";
+
+            if (activeTabId === 'warehouse-tab') {
+                updateTopCards(filteredList);
+            }
+
+            filteredList.forEach(equip => {
+                let equipStatusText = t(statusMap[equip.status] || equip.status);
+                const row = `
+                    <tr>
+                        <td style="font-weight:bold; color:#d35400;">Anbar</td>
+                        <td>-</td>
+                        <td>${equip.name} <br> <span style="font-size:12px; color:#777;">${equip.model}</span></td>
+                        <td class="status-${equip.status.toLowerCase()}">${equipStatusText}</td>
+                        <td style="color: #636e72; font-family: monospace;">${equip.systemId || 'N/A'}</td>
+                        <td style="text-align: center; display:flex; justify-content:center; gap:5px;">
+                            <button class="btn-qr" onclick="openQRModal('${equip.id}')" title="QR Kod"><i class="fas fa-qrcode"></i></button>
+                            <button class="btn-view" onclick="viewItemDetails('${equip.id}')" title="${t('equipmentDetails')}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // Yuxarıdakı Yaşıl/Qırmızı kartları yeniləyən funksiya
+        function updateTopCards(list) {
+            let total = list.length;
+            let islek = list.filter(e => e.status === "İşlək").length;
+            let xarab = list.filter(e => e.status !== "İşlək").length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-islek').innerText = islek;
+            document.getElementById('stat-xarab').innerText = xarab;
+        }
+
+        // Listenerlər (Ümumi)
+        document.getElementById('inventory-search').addEventListener('input', renderGeneralTable);
+        document.getElementById('filter-type').addEventListener('change', renderGeneralTable);
+        document.getElementById('filter-status').addEventListener('change', renderGeneralTable);
+
+        // Listenerlər (Anbar)
+        document.getElementById('wh-search').addEventListener('input', renderWarehouseTable);
+        document.getElementById('wh-filter-type').addEventListener('change', renderWarehouseTable);
+        document.getElementById('wh-filter-status').addEventListener('change', renderWarehouseTable);
+
+        // === STATISTIKA FUNKSIYALARI (TAB 3) ===
+        function updateStatsCounts() {
+            const counts = { "Kompüter": 0, "Monitor": 0, "Printer": 0, "Digər": 0 };
+            
+            inventoryCache.forEach(item => {
+                let typeKey = item.type;
+                if (typeKey === "Computer" || typeKey === "Компьютер") typeKey = "Kompüter";
+                if (counts[typeKey] !== undefined) counts[typeKey]++; else counts["Digər"]++;
+            });
+
+            document.getElementById('count-Kompüter').innerText = counts["Kompüter"];
+            document.getElementById('count-Monitor').innerText = counts["Monitor"];
+            document.getElementById('count-Printer').innerText = counts["Printer"];
+            document.getElementById('count-Digər').innerText = counts["Digər"];
+        }
+
+        window.openTypeBreakdown = function(type) {
+            currentSelectedType = type;
+            const modal = document.getElementById('type-breakdown-modal');
+            const title = document.getElementById('breakdown-title');
+            const body = document.getElementById('breakdown-body');
+            
+            title.innerText = t(typeMap[type] || type) + " - " + t('tabStatistics');
+            
+            const filtered = inventoryCache.filter(item => {
+                let tKey = item.type;
+                if (tKey === "Computer") tKey = "Kompüter";
+                return tKey === type;
+            });
+
+            let total = filtered.length;
+            let warehouse = 0;
+            let working = 0;
+            let broken = 0;
+
+            filtered.forEach(item => {
+                if (!item.holderName || item.holderName === "Anbar") warehouse++;
+                else if (item.status === "İşlək") working++;
+                else broken++;
+            });
+
+            body.innerHTML = `
+                <div class="drilldown-list">
+                    <div class="drilldown-item">
+                        <div class="dd-info"><h4>${t('statTotal')}</h4></div>
+                        <div class="dd-count">${total}</div>
+                    </div>
+                    <div class="drilldown-item" onclick="openFilteredList('warehouse')">
+                        <div class="dd-info"><h4>${t('statWarehouse')}</h4><p>Anbarda olanlar</p></div>
+                        <div class="dd-count neutral">${warehouse}</div>
+                    </div>
+                    <div class="drilldown-item" onclick="openFilteredList('working')">
+                        <div class="dd-info"><h4>${t('statWorking')}</h4><p>Təhvil verilmiş işlək</p></div>
+                        <div class="dd-count success">${working}</div>
+                    </div>
+                    <div class="drilldown-item" onclick="openFilteredList('broken')">
+                        <div class="dd-info"><h4>${t('statBroken')}</h4><p>Xarab və ya təmirdə</p></div>
+                        <div class="dd-count warning">${broken}</div>
+                    </div>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        window.openFilteredList = function(category) {
+            document.getElementById('type-breakdown-modal').style.display = 'none'; 
+            const modal = document.getElementById('filtered-list-modal');
+            const title = document.getElementById('filtered-list-title');
+            const tbody = document.getElementById('filtered-list-tbody');
+            
+            let catTitle = "";
+            if(category === 'warehouse') catTitle = t('statWarehouse');
+            else if(category === 'working') catTitle = t('statWorking');
+            else if(category === 'broken') catTitle = t('statBroken');
+            
+            title.innerText = `${t(typeMap[currentSelectedType] || currentSelectedType)} - ${catTitle}`;
+            tbody.innerHTML = "";
+
+            const filtered = inventoryCache.filter(item => {
+                let tKey = item.type;
+                if (tKey === "Computer") tKey = "Kompüter";
+                if (tKey !== currentSelectedType) return false;
+
+                if (category === 'warehouse') return (!item.holderName || item.holderName === "Anbar");
+                if (category === 'working') return (item.holderName && item.holderName !== "Anbar" && item.status === "İşlək");
+                if (category === 'broken') return (item.holderName && item.holderName !== "Anbar" && item.status !== "İşlək");
+                return false;
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px;">Məlumat yoxdur</td></tr>`;
+            } else {
+                filtered.forEach(equip => {
+                    const row = `
+                        <tr>
+                            <td style="font-weight:bold;">${equip.holderName || "Anbar"} <br> <span style="font-size:11px; color:#777;">${equip.holderFaculty || ""}</span></td>
+                            <td>${equip.name}</td>
+                            <td style="font-family:monospace;">${equip.systemId || 'N/A'}</td>
+                            <td style="display:flex; justify-content:center; gap:5px;">
+                                <button class="btn-qr" onclick="openQRModal('${equip.id}')" title="QR Kod"><i class="fas fa-qrcode"></i></button>
+                                <button class="btn-view" onclick="viewItemDetails('${equip.id}')"><i class="fas fa-eye"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            }
+            modal.style.display = 'flex';
+        }
+
+        window.backToBreakdown = function() {
+            document.getElementById('filtered-list-modal').style.display = 'none';
+            document.getElementById('type-breakdown-modal').style.display = 'flex';
+        }
+
+        document.getElementById('type-breakdown-close').onclick = () => document.getElementById('type-breakdown-modal').style.display = 'none';
+        document.getElementById('filtered-list-close').onclick = () => document.getElementById('filtered-list-modal').style.display = 'none';
+
+        // 3. Detallara baxış (Ümumi funksiya)
+        window.viewItemDetails = function(id) {
+            const item = inventoryCache.find(e => e.id === id);
+            if(!item) return;
+
+            const content = document.getElementById('item-details-content');
+            const statusText = t(statusMap[item.status] || item.status);
+            const typeText = t(typeMap[item.type] || item.type);
+            
+            content.innerHTML = `
+                <div class="detail-item full-width"><span class="detail-label" style="color: #0984e3;">SYSTEM ID</span><span class="detail-value" style="font-weight: bold; font-size: 16px;">${item.systemId || 'N/A'}</span></div>
+                <div class="detail-item full-width"><span class="detail-label">${t('lblHolderName')}</span><span class="detail-value">${item.holderName}</span></div>
+                <div class="detail-item full-width"><span class="detail-label">${t('lblHolderFaculty')}</span><span class="detail-value">${item.holderFaculty}</span></div>
+                <div class="detail-item"><span class="detail-label">${t('formName')}</span><span class="detail-value">${item.name}</span></div>
+                <div class="detail-item"><span class="detail-label">${t('formModel')}</span><span class="detail-value">${item.model}</span></div>
+                <div class="detail-item"><span class="detail-label">${t('formType')}</span><span class="detail-value">${typeText}</span></div>
+                <div class="detail-item"><span class="detail-label">${t('formStatus')}</span><span class="detail-value">${statusText}</span></div>
+                <div class="detail-item"><span class="detail-label">${t('formSerial')}</span><span class="detail-value">${item.serial || '-'}</span></div>
+                <div class="detail-item"><span class="detail-label">${t('formMac')}</span><span class="detail-value">${item.mac || '-'}</span></div>
+                <div class="detail-item"><span class="detail-label">${t('formDate')}</span><span class="detail-value">${item.purchaseDate || '-'}</span></div>
+                <div class="detail-item full-width"><span class="detail-label">${t('formNotes')}</span><span class="detail-value">${item.notes || '-'}</span></div>
+            `;
+            
+            const imageContainer = document.getElementById('item-image-container');
+            if (item.imageUrl) {
+                imageContainer.innerHTML = `<button class="btn-view-image" onclick="window.open('${item.imageUrl}', '_blank')"><i class="fas fa-image"></i> ${t('viewImage')}</button>`;
+            } else {
+                imageContainer.innerHTML = "";
+            }
+            
+            document.getElementById('item-details-modal').style.display = 'flex';
+        }
+
+        // --- QR KOD (Yeni) ---
+        window.openQRModal = function(id) {
+            if (window.event) window.event.stopPropagation();
+            const item = inventoryCache.find(e => e.id === id);
+            if(!item) return;
+
+            document.getElementById('qr-modal').style.display = 'flex';
+            
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = ""; 
+            
+            // --- QR KOD LINKI (index.html-ə yönləndirmə) ---
+            const path = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+            const qrUrl = `${path}index.html?viewId=${item.id}`;
+            
+            document.getElementById('qr-link-text').innerText = qrUrl;
+            
+            new QRCode(qrContainer, {
+                text: qrUrl,
+                width: 200,
+                height: 200,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+        
+        window.downloadQR = function() {
+            const qrContainer = document.getElementById('qrcode');
+            const img = qrContainer.querySelector('img');
+            
+            if(img && img.src) {
+                const link = document.createElement('a');
+                link.href = img.src;
+                link.download = 'QR_Code.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert("QR kod hələ yaranmayıb, bir az gözləyin.");
+            }
+        }
+
+        // QR oxudanda avtomatik açılma funksiyası
+        function checkUrlForQR() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewId = urlParams.get('viewId');
+            if (viewId && inventoryCache.length > 0) {
+                // viewId-ni təmizləmədən birbaşa açır
+                viewItemDetails(viewId);
+            }
+        }
+
+        document.getElementById('item-details-close').onclick = () => {
+             document.getElementById('item-details-modal').style.display = 'none';
+             history.pushState({}, document.title, window.location.pathname); // URL-i təmizlə
+        }
+        document.getElementById('item-details-ok').onclick = () => {
+            document.getElementById('item-details-modal').style.display = 'none';
+            history.pushState({}, document.title, window.location.pathname); // URL-i təmizlə
+        }
+
+        // --- PROFİL & ŞİFRƏ (Standard) ---
+        const profileModal = document.getElementById('profile-modal');
+        document.getElementById('profile-btn').onclick = () => profileModal.style.display = 'flex';
+        document.getElementById('profile-modal-close').onclick = () => profileModal.style.display = 'none';
+        document.getElementById('profile-cancel-btn').onclick = () => profileModal.style.display = 'none';
+
+        document.getElementById('profile-settings-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('profile-name').value;
+            db.collection("users").doc(currentUserId).update({ name: name })
+            .then(() => { alert(t('profileUpdateSuccess')); profileModal.style.display = 'none'; })
+            .catch(err => { alert(t('profileUpdateError') + err.message); });
+        });
+
+        document.getElementById('profile-pic-upload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const storageRef = storage.ref(`profile_pics/${currentUserId}/${file.name}`);
+            const uploadTask = storageRef.put(file);
+            uploadTask.on('state_changed', null, (error) => alert(error.message), () => {
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    db.collection("users").doc(currentUserId).update({ profilePicUrl: downloadURL });
+                });
+            });
+        });
+
+        const changePasswordModal = document.getElementById('change-password-modal');
+        document.getElementById('change-password-btn-open').onclick = () => {
+            profileModal.style.display = 'none';
+            changePasswordModal.style.display = 'flex';
+        };
+        document.getElementById('password-modal-close').onclick = () => changePasswordModal.style.display = 'none';
+        document.getElementById('password-cancel-btn').onclick = () => changePasswordModal.style.display = 'none';
+
+        document.getElementById('change-password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const oldPass = document.getElementById('old-password').value;
+            const newPass = document.getElementById('new-password').value;
+            const confirmPass = document.getElementById('confirm-new-password').value;
+            if (newPass !== confirmPass) { alert(t('pwMismatch')); return; }
+            
+            const user = auth.currentUser;
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, oldPass);
+            try {
+                await user.reauthenticateWithCredential(credential);
+                await user.updatePassword(newPass);
+                alert(t('passwordUpdateSuccess'));
+                changePasswordModal.style.display = 'none';
+            } catch (error) {
+                alert(t('passwordUpdateError') + error.message);
+            }
+        });
+
+        // Dil dəyişmə
+        document.addEventListener('DOMContentLoaded', () => {
+            const langBtn = document.getElementById('lang-btn');
+            const dropdown = document.getElementById('lang-dropdown');
+            
+            if(langBtn) {
+                langBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
+                window.addEventListener('click', () => { if (dropdown.classList.contains('show')) dropdown.classList.remove('show'); });
+            }
+            document.querySelectorAll('.lang-dropdown a').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setLanguage(e.target.getAttribute('data-lang'));
+                });
+            });
+        });
+    </script>
+</body>
+</html>

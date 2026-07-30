@@ -1,0 +1,354 @@
+/* === STYLE.CSS (TechCore Dizaynı) === */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif; /* Yeni font */
+}
+
+body {
+    /* İstifadəçinin göndərdiyi arxa fon şəkli */
+    background-image: url('https://qu.edu.az/uploads/450072451_1524109088230628_9124582998417446705_n-66b4a39a151f3.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    position: relative;
+}
+
+/* Arxa fonu tündləşdirən qat */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.9) 100%);
+    backdrop-filter: blur(3px);
+    z-index: 1;
+}
+
+.main-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* --- YENİ TECHCORE LOGO STİLİ --- */
+.brand-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+    gap: 12px;
+}
+
+.brand-icon {
+    font-size: 36px;
+    color: #34d399; /* Parlaq yaşıl/firuzəyi */
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+}
+
+.brand-text {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -1px;
+    text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.subtitle {
+    color: #94a3b8;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* --- FORM QUTUSU --- */
+.form-box {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    padding-bottom: 20px;
+}
+
+/* --- TABLAR --- */
+.tab-nav {
+    display: flex;
+    background-color: #f1f5f9;
+    padding: 6px;
+    margin: 6px;
+    border-radius: 16px;
+}
+
+.tab-link {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748b;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.tab-link.active {
+    background-color: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.tab-content {
+    padding: 25px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+.tab-content.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- INPUTLAR VƏ IKONLAR --- */
+.input-group {
+    margin-bottom: 18px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 14px 14px 42px; /* İkon üçün sol tərəfdən boşluq */
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #34d399; /* TechCore rəngi */
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1);
+}
+
+.input-group input:focus + .input-icon,
+.input-group input:focus ~ .input-icon {
+    color: #34d399;
+}
+
+/* Şifrə göstər/gizlə gözü */
+.toggle-password {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #94a3b8;
+}
+.toggle-password:hover { color: #334155; }
+
+/* --- DÜYMƏLƏR --- */
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* TechCore Yaşıl Gradient */
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.reset-btn-style {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); /* Narıncı */
+}
+.reset-btn-style:hover {
+    box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
+}
+
+/* --- Linklər --- */
+.forgot-pass-box {
+    text-align: right;
+    margin-bottom: 20px;
+}
+.forgot-pass-box a {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.forgot-pass-box a:hover {
+    color: #059669;
+}
+
+/* --- DİL DƏYİŞDİRİCİ --- */
+.lang-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.2);
+    z-index: 10;
+    transition: background 0.3s;
+}
+.lang-switcher:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.lang-dropdown {
+    display: none;
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    z-index: 100;
+}
+.lang-dropdown.show { display: block; }
+.lang-dropdown a {
+    color: #334155;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+.lang-dropdown a:hover {
+    background-color: #f1f5f9;
+    color: #059669;
+}
+
+/* --- HELP IKONU VƏ MODAL --- */
+.help-icon {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.3s;
+}
+.help-icon:hover { color: rgba(255, 255, 255, 1); }
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-content h2 {
+    color: #059669;
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+.modal-content p {
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    color: #94a3b8;
+    font-size: 28px;
+    cursor: pointer;
+}
+.modal-close:hover { color: #0f172a; }
+
+/* Mobil Uyğunluq */
+@media (max-width: 480px) {
+    .main-container { padding: 10px; }
+    .form-box { width: 100%; }
+    .brand-text { font-size: 28px; }
+}
