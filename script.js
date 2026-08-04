@@ -1,4 +1,4 @@
-// === FIREBASE CONFIG ===
+// === FIREBASE CONFIG ==='''
 const firebaseConfig = {
   apiKey: "AIzaSyCMmJNA8aj906l-x07XzMkgpLhBk2a0j_E",
   authDomain: "smartstorage-62517.firebaseapp.com",
@@ -9,14 +9,32 @@ const firebaseConfig = {
   measurementId: "G-MCP6LZHN9K"
 };
 
+
 try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error(e); }
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+
 // === KÖMƏKÇİ FUNKSİYALAR ===
+
+// 1. Domain Yoxlaması (@qu.edu.az olmalıdır)
 function isKarabakhEmail(email) {
-    return true;
+    return email.toLowerCase().endsWith('@qu.edu.az');
 }
+
+// 2. VIP SİYAHI YOXLAMASI (Bazada varmı?)
+async function checkWhitelist(email) {
+    try {
+        const snapshot = await db.collection("allowed_users")
+                                 .where("email", "==", email.toLowerCase().trim())
+                                 .get();
+        return !snapshot.empty;
+    } catch (error) {
+        console.error("Siyahı yoxlanarkən xəta:", error);
+        return false;
+    }
+}
+
 
 // === TABLAR ===
 const tabLinks = document.querySelectorAll('.tab-link');
@@ -52,7 +70,7 @@ if(helpModal) {
 }
 
 // =======================================================
-// === QEYDİYYAT ===
+// === QEYDİYYAT (VIP SİYAHI YOXLAMASI İLƏ) ===
 // =======================================================
 const registerForm = document.getElementById('register-form');
 
@@ -64,21 +82,37 @@ if (registerForm) {
         const password = document.getElementById('register-password').value;
         const passwordConfirm = document.getElementById('register-password-confirm').value;
 
+        // 1. Domain Yoxlaması
+        if (!isKarabakhEmail(email)) {
+            alert("Qeydiyyat qadağandır!\nYalnız @qu.edu.az korporativ maili qəbul olunur.");
+            return;
+        }
+
+        // 2. VIP Siyahı Yoxlaması
+        const isAllowed = await checkWhitelist(email);
+        if (!isAllowed) {
+            alert("DİQQƏT: Sizin mailiniz sistemin icazəli siyahısında yoxdur.\n\nXahiş edirik İnzibatçı (Admin) ilə əlaqə saxlayın ki, mailinizi sistemə əlavə etsin.");
+            return;
+        }
+
+        // 3. Şifrə uyğunluğu
         if (password !== passwordConfirm) {
             alert("Şifrələr uyğun deyil");
             return;
         }
 
+        // 4. Qeydiyyatı tamamla
         auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
+                // Admin mailini yoxlayırıq, əks halda adi user (amma statusu active)
                 let userRole = (email === 'admin@qu.edu.az') ? "admin" : "user";
 
                 db.collection("users").doc(user.uid).set({
                     name: name,
                     email: user.email,
                     role: userRole,
-                    status: 'active'
+                    status: 'active' // YENİ: Qeydiyyat zamanı status aktiv olur
                 })
                 .then(() => {
                     user.sendEmailVerification().then(() => {
@@ -97,7 +131,7 @@ if (registerForm) {
 }
 
 // =======================================================
-// === GİRİŞ SİSTEMİ ===
+// === GİRİŞ SİSTEMİ (Smartstorage Məntiqi ilə) ===
 // =======================================================
 
 const loginForm = document.getElementById('login-form');
@@ -114,11 +148,13 @@ if(forgotLink && loginBtn && resetBtn) {
         isResetMode = !isResetMode;
 
         if (isResetMode) {
+            // SIFIRLAMA REJİMİ
             if(passwordGroup) passwordGroup.style.display = 'none';
             loginBtn.style.display = 'none';
             resetBtn.style.display = 'block';
             forgotLink.textContent = "Geri qayıt";
         } else {
+            // GİRİŞ REJİMİ
             if(passwordGroup) passwordGroup.style.display = 'block';
             loginBtn.style.display = 'block';
             resetBtn.style.display = 'none';
@@ -127,12 +163,14 @@ if(forgotLink && loginBtn && resetBtn) {
     });
 }
 
+// SIFIRLAMA
 if (resetBtn) {
     resetBtn.addEventListener('click', (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
 
         if (!email) { alert("Mail yazın!"); return; }
+        if (!isKarabakhEmail(email)) { alert("Yalnız @qu.edu.az"); return; }
 
         auth.sendPasswordResetEmail(email)
             .then(() => {
@@ -146,6 +184,7 @@ if (resetBtn) {
     });
 }
 
+// GİRİŞ
 if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -154,42 +193,52 @@ if (loginForm) {
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
 
+        if (!isKarabakhEmail(email)) { alert("Yalnız @qu.edu.az"); return; }
+
         auth.signInWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
-
+                
+                // Mail təsdiqi yoxlanışı
                 if (!user.emailVerified) {
                     alert("Zəhmət olmasa mailinizi təsdiqləyin!");
                     auth.signOut();
                     return;
                 }
 
+                // İstifadəçi məlumatlarını və STATUSUNU yoxlayırıq
                 const userDocRef = db.collection("users").doc(user.uid);
                 userDocRef.get().then((doc) => {
                     if (doc.exists) {
                         const userData = doc.data();
 
+                        // YENİ: Deaktiv status yoxlanışı
                         if (userData.status === 'deactivated') {
                             alert("Sizin hesabınız Admin tərəfindən deaktiv edilib. Giriş qadağandır.");
                             auth.signOut();
                             return;
                         }
 
+                        // === DÜZƏLİŞ: QR KOD LİNKİNİ QORUMAQ ÜÇÜN ===
+                        // Giriş edərkən URL-də viewId varsa, onu növbəti səhifəyə ötürürük.
                         const urlParams = new URLSearchParams(window.location.search);
                         const viewId = urlParams.get('viewId');
                         let redirectUrl = "";
 
+                        // Roluna görə yönləndirmə
                         if (userData.role === 'admin') {
                             redirectUrl = "admin.html";
                         } else {
                             redirectUrl = "dashboard.html";
                         }
 
+                        // Əgər viewId varsa, linkin sonuna əlavə et
                         if (viewId) {
                             redirectUrl += `?viewId=${viewId}`;
                         }
 
                         window.location.href = redirectUrl;
+                        // ==============================================
                     } else {
                         alert("İstifadəçi məlumatları tapılmadı.");
                         auth.signOut();

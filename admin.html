@@ -13,7 +13,7 @@
     <style>
         /* === RESET & BASIC === */
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Roboto', sans-serif; background-color: #f4f7fc; color: #2d3436; }
+        body { margin: 0; font-family: 'Roboto', sans-serif; background-color: #e9eaeb; color: #303f43; }
         
         /* === HEADER STİLİ === */
         .panel-header {
@@ -431,6 +431,8 @@
                                         <option value="Kompüter" data-key="formTypeComputer">Kompüter</option>
                                         <option value="Monitor" data-key="formTypeMonitor">Monitor</option>
                                         <option value="Printer" data-key="formTypePrinter">Printer</option>
+                                        <option value="Masa" data-key="formTypeMasa">Masa</option>
+                                        <option value="Şkaf " data-key="formTypeŞkaf ">Şkaf</option>
                                         <option value="Digər" data-key="formTypeOther">Digər</option>
                                     </select>
                                 </div>
@@ -641,6 +643,7 @@
                                 <option value="İncəsənət">İncəsənət</option>
                                 <option value="Rəqəmsal">Rəqəmsal</option>
                                 <option value="Tibb">Tibb</option>
+                                
                                 <option value="Digər">Digər</option>
                             </select>
                             <input type="text" id="edit-other-faculty-input" placeholder="Fakültə adını yazın..." style="display: none; margin-top: 5px;">
@@ -654,6 +657,8 @@
                                 <option value="Kompüter" data-key="formTypeComputer">Kompüter</option>
                                 <option value="Monitor" data-key="formTypeMonitor">Monitor</option>
                                 <option value="Printer" data-key="formTypePrinter">Printer</option>
+                                <option value="Şkaf" data-key="formTypeŞkaf">Şkaf</option>
+                                <option value="Masa" data-key="formTypeMasa">Masa</option>
                                 <option value="Digər" data-key="formTypeOther">Digər</option>
                             </select>
                         </div>
@@ -741,6 +746,8 @@
                 formTypeComputer: "Kompüter",
                 formTypeMonitor: "Monitor",
                 formTypePrinter: "Printer",
+                formTypeŞkaf: "Şkaf",
+                formTypeMasa: "Masa",
                 formTypeOther: "Digər",
                 formName: "Avadanlığın adı *",
                 formNamePlaceholder: "məs: Dell Latitude Laptop",
@@ -838,6 +845,10 @@
                  formTypeComputer: "Computer",
                  formTypeMonitor: "Monitor",
                  formTypePrinter: "Printer",
+                 /* Qeyd 
+                 Şkaf 
+                 MAsa 
+                 in english */
                  formTypeOther: "Other",
                  formName: "Equipment Name *",
                  formModel: "Brand/Model *",
@@ -935,6 +946,10 @@
                  formTypeComputer: "Компьютер",
                  formTypeMonitor: "Монитор",
                  formTypePrinter: "Принтер",
+                 /* Qeyd 
+                  skaf
+                 masa
+                 rusca yazilmalidir burda */
                  formTypeOther: "Другое",
                  formName: "Название *",
                  formModel: "Модель *",
@@ -1064,6 +1079,8 @@
             "Kompüter": "formTypeComputer",
             "Monitor": "formTypeMonitor",
             "Printer": "formTypePrinter",
+            "Şkaf": "formTypeŞkaf",
+            "Masa": "formTypeMasa",
             "Digər": "formTypeOther",
             "Computer": "formTypeComputer",
             "Компьютер": "formTypeComputer"
@@ -1077,18 +1094,18 @@
             "Broken": "formStatusBroken",
             "Repair": "formStatusRepair"
         };
-
+// Data api si burdadir deyis bunu 
         // === FIREBASE CONFIG ===
-      const firebaseConfig = {
-  apiKey: "AIzaSyCMmJNA8aj906l-x07XzMkgpLhBk2a0j_E",
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMmJNA8aj906l-x07XzMkgpLhBk2a0j_E",
   authDomain: "smartstorage-62517.firebaseapp.com",
   projectId: "smartstorage-62517",
   storageBucket: "smartstorage-62517.firebasestorage.app",
   messagingSenderId: "385539276000",
   appId: "1:385539276000:web:74fbf3e8df18137540a485",
   measurementId: "G-MCP6LZHN9K"
-};  
-
+        };
         
         firebase.initializeApp(firebaseConfig);
         const secondaryApp = firebase.initializeApp(firebaseConfig, "secondary");

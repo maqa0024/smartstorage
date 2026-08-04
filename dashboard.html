@@ -340,6 +340,8 @@
                                 <option value="Kompüter" data-key="formTypeComputer">Kompüter</option>
                                 <option value="Monitor" data-key="formTypeMonitor">Monitor</option>
                                 <option value="Printer" data-key="formTypePrinter">Printer</option>
+                                <option value="Şkaf" data-key="formTypeŞkaf">Şkaf</option>
+                                <option value="Masa" data-key="formTypeMasa">Masa</option>
                                 <option value="Digər" data-key="formTypeOther">Digər</option>
                             </select>
                             <select id="filter-status" class="filter-select">
@@ -384,6 +386,8 @@
                                 <option value="Kompüter" data-key="formTypeComputer">Kompüter</option>
                                 <option value="Monitor" data-key="formTypeMonitor">Monitor</option>
                                 <option value="Printer" data-key="formTypePrinter">Printer</option>
+                                <option value="Şkaf" data-key="formTypeŞkaf">Şkaf</option>
+                                <option value="Masa" data-key="formTypeMasa">Masa</option>
                                 <option value="Digər" data-key="formTypeOther">Digər</option>
                             </select>
                             <select id="wh-filter-status" class="filter-select">
@@ -441,6 +445,13 @@
                             <div class="stat-cat-info">
                                 <span class="stat-cat-title" data-key="formTypePrinter">Printer</span>
                                 <span class="stat-cat-count" id="count-Printer">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-category-card" onclick="openTypeBreakdown('Şkaf')">
+                            <div class="stat-cat-icon"><i class="fas fa-Şkaf"></i></div>
+                            <div class="stat-cat-info">
+                                <span class="stat-cat-title" data-key="formTypeŞkaf">Şkaf</span>
+                                <span class="stat-cat-count" id="count-Şkaf">0</span>
                             </div>
                         </div>
                         <div class="stat-category-card" onclick="openTypeBreakdown('Digər')">
@@ -628,6 +639,7 @@
                 formTypeComputer: "Kompüter",
                 formTypeMonitor: "Monitor",
                 formTypePrinter: "Printer",
+                formTypeŞkaf :"Şkaf",
                 formTypeOther: "Digər",
                 filterAllTypes: "Bütün Növlər",
                 filterAllStatuses: "Bütün Statuslar",
@@ -765,15 +777,15 @@
         }
 
         // === FIREBASE ===
-       const firebaseConfig = {
-  apiKey: "AIzaSyCMmJNA8aj906l-x07XzMkgpLhBk2a0j_E",
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMmJNA8aj906l-x07XzMkgpLhBk2a0j_E",
   authDomain: "smartstorage-62517.firebaseapp.com",
   projectId: "smartstorage-62517",
   storageBucket: "smartstorage-62517.firebasestorage.app",
   messagingSenderId: "385539276000",
   appId: "1:385539276000:web:74fbf3e8df18137540a485",
   measurementId: "G-MCP6LZHN9K"
-};
+        };
         
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -886,6 +898,7 @@
             "Kompüter": "formTypeComputer",
             "Monitor": "formTypeMonitor",
             "Printer": "formTypePrinter",
+            "Şkaf": "formTypeŞkaf",
             "Digər": "formTypeOther",
             "Computer": "formTypeComputer", "Компьютер": "formTypeComputer" 
         };
