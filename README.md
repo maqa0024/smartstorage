@@ -1,6 +1,6 @@
 🏢 **SmartStorage - Anbar və İnventar İdarəetmə Sistemi**
 
-**Canlı Demo:** https://github.com/maqa0024.github.io/smartstorage
+**Canlı Demo:** https://maqa0024.github.io/smartstorage/
 
 SmartStorage, təşkilat və müəssisələrin daxilində olan mal-materialların, texniki vasitələrin və ehtiyat hissələrinin hərəkətini, sayını və yerləşməsini rəqəmsal mühitdə izləmək üçün nəzərdə tutulmuş müasir idarəetmə həllidir. Sistem ənənəvi əl ilə aparılan qeydiyyatı tamamilə ləğv edərək, resursların təhlükəsiz saxlanılmasını və əməliyyatların anında icrasını təmin edir.
 
