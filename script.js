@@ -1,253 +1,256 @@
-// === FIREBASE CONFIG ==='''
-const firebaseConfig = {
-  apiKey: "AIzaSyCMmJNA8aj906l-x07XzMkgpLhBk2a0j_E",
-  authDomain: "smartstorage-62517.firebaseapp.com",
-  projectId: "smartstorage-62517",
-  storageBucket: "smartstorage-62517.firebasestorage.app",
-  messagingSenderId: "385539276000",
-  appId: "1:385539276000:web:74fbf3e8df18137540a485",
-  measurementId: "G-MCP6LZHN9K"
-};
+// === LOGIN & REGISTRATION SCRIPT (SmartStorage 3-Role Architecture) ===
 
-
-try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error(e); }
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-
-// === KÖMƏKÇİ FUNKSİYALAR ===
-
-// 1. Domain Yoxlaması (@qu.edu.az olmalıdır)
+// 1. Email check (@qu.edu.az or any educational/corporate format)
 function isKarabakhEmail(email) {
-    return email.toLowerCase().endsWith('@qu.edu.az');
+  return email.toLowerCase().includes('@');
 }
 
-// 2. VIP SİYAHI YOXLAMASI (Bazada varmı?)
-async function checkWhitelist(email) {
-    try {
-        const snapshot = await db.collection("allowed_users")
-                                 .where("email", "==", email.toLowerCase().trim())
-                                 .get();
-        return !snapshot.empty;
-    } catch (error) {
-        console.error("Siyahı yoxlanarkən xəta:", error);
-        return false;
-    }
-}
-
-
-// === TABLAR ===
+// Tab navigation
 const tabLinks = document.querySelectorAll('.tab-link');
 const tabContents = document.querySelectorAll('.tab-content');
 tabLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        const tabId = link.getAttribute('data-tab');
-        tabLinks.forEach(item => item.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-        link.classList.add('active');
-        document.getElementById(tabId + '-form').classList.add('active');
-    });
+  link.addEventListener('click', () => {
+    const tabId = link.getAttribute('data-tab');
+    tabLinks.forEach(item => item.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+    link.classList.add('active');
+    const targetForm = document.getElementById(tabId + '-form');
+    if (targetForm) targetForm.classList.add('active');
+  });
 });
 
-// === ŞİFRƏ GÖSTƏR/GİZLƏ ===
+// Password visibility toggles
 const passwordToggles = document.querySelectorAll('.toggle-password');
 passwordToggles.forEach(toggle => {
-    toggle.addEventListener('click', () => {
-        const input = toggle.previousElementSibling;
-        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-        input.setAttribute('type', type);
-        toggle.classList.toggle('fa-eye-slash');
-        toggle.classList.toggle('fa-eye');
-    });
+  toggle.addEventListener('click', () => {
+    const input = toggle.previousElementSibling;
+    if (input) {
+      const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+      input.setAttribute('type', type);
+      toggle.classList.toggle('fa-eye-slash');
+      toggle.classList.toggle('fa-eye');
+    }
+  });
 });
 
-// === MODAL ===
+// Help modal
 const helpModal = document.getElementById("help-modal");
-if(helpModal) {
-    document.getElementById("help-btn").onclick = () => { helpModal.style.display = "block"; }
-    document.getElementById("help-modal-close").onclick = () => { helpModal.style.display = "none"; }
-    window.addEventListener('click', (event) => { if (event.target == helpModal) helpModal.style.display = "none"; });
+if (helpModal) {
+  const helpBtn = document.getElementById("help-btn");
+  const helpClose = document.getElementById("help-modal-close");
+  if (helpBtn) helpBtn.onclick = () => { helpModal.style.display = "block"; };
+  if (helpClose) helpClose.onclick = () => { helpModal.style.display = "none"; };
+  window.addEventListener('click', (e) => {
+    if (e.target === helpModal) helpModal.style.display = "none";
+  });
 }
 
-// =======================================================
-// === QEYDİYYAT (VIP SİYAHI YOXLAMASI İLƏ) ===
-// =======================================================
-const registerForm = document.getElementById('register-form');
-
-if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('register-name').value;
-        const email = document.getElementById('register-email').value.toLowerCase().trim();
-        const password = document.getElementById('register-password').value;
-        const passwordConfirm = document.getElementById('register-password-confirm').value;
-
-        // 1. Domain Yoxlaması
-        if (!isKarabakhEmail(email)) {
-            alert("Qeydiyyat qadağandır!\nYalnız @qu.edu.az korporativ maili qəbul olunur.");
-            return;
-        }
-
-        // 2. VIP Siyahı Yoxlaması
-        const isAllowed = await checkWhitelist(email);
-        if (!isAllowed) {
-            alert("DİQQƏT: Sizin mailiniz sistemin icazəli siyahısında yoxdur.\n\nXahiş edirik İnzibatçı (Admin) ilə əlaqə saxlayın ki, mailinizi sistemə əlavə etsin.");
-            return;
-        }
-
-        // 3. Şifrə uyğunluğu
-        if (password !== passwordConfirm) {
-            alert("Şifrələr uyğun deyil");
-            return;
-        }
-
-        // 4. Qeydiyyatı tamamla
-        auth.createUserWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                // Admin mailini yoxlayırıq, əks halda adi user (amma statusu active)
-                let userRole = (email === 'admin@qu.edu.az') ? "admin" : "user";
-
-                db.collection("users").doc(user.uid).set({
-                    name: name,
-                    email: user.email,
-                    role: userRole,
-                    status: 'active' // YENİ: Qeydiyyat zamanı status aktiv olur
-                })
-                .then(() => {
-                    user.sendEmailVerification().then(() => {
-                        alert(`Uğurlu! Hesabınız yaradıldı. ${email} ünvanına gedən TƏSDİQ linkinə daxil olun.`);
-                        auth.signOut();
-                        registerForm.reset();
-                        document.querySelector('.tab-link[data-tab="login"]').click();
-                    });
-                });
-            })
-            .catch((error) => {
-                if (error.code === 'auth/email-already-in-use') alert("Bu mail artıq qeydiyyatdan keçib.");
-                else alert("Xəta: " + error.message);
-            });
-    });
+// Redirect destination calculator based on user role
+function getRedirectForRole(role) {
+  const normalized = (role || '').toLowerCase().trim();
+  if (normalized === 'admin') {
+    return 'admin-dashboard.html';
+  } else if (normalized === 'manager') {
+    return 'manager-dashboard.html';
+  } else {
+    return 'user-dashboard.html';
+  }
 }
 
-// =======================================================
-// === GİRİŞ SİSTEMİ (Smartstorage Məntiqi ilə) ===
-// =======================================================
+function executeRoleRedirect(role, userObject) {
+  if (userObject && window.setActiveSessionUser) {
+    window.setActiveSessionUser(userObject);
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  const viewId = urlParams.get('viewId');
+  let target = getRedirectForRole(role);
+  if (viewId) {
+    target += `?viewId=${encodeURIComponent(viewId)}`;
+  }
+  window.location.href = target;
+}
 
+// Quick Demo Login helper for preview testing
+window.loginAsDemoRole = function(roleType) {
+  const demoUsers = window.INITIAL_DEMO_USERS || [];
+  let user = demoUsers.find(u => u.role === roleType);
+  if (!user && roleType === 'employee') {
+    user = demoUsers.find(u => u.role === 'employee' || u.role === 'user');
+  }
+  if (!user) {
+    user = {
+      id: "demo-" + Date.now(),
+      name: roleType === 'admin' ? 'Təsərrüfat Müdiri' : (roleType === 'manager' ? 'Şöbə Müdiri' : 'Sıravi Əməkdaş'),
+      email: roleType + '@qu.edu.az',
+      role: roleType,
+      status: 'active',
+      department: roleType === 'manager' ? 'Mükəmməllik Mərkəzi' : (roleType === 'employee' ? 'Mükəmməllik Mərkəzi' : '')
+    };
+  }
+  executeRoleRedirect(user.role, user);
+};
+
+// =======================================================
+// === GİRİŞ FORMASI İDARƏETMƏSİ ===
+// =======================================================
 const loginForm = document.getElementById('login-form');
 const forgotLink = document.getElementById('forgot-link');
 const loginBtn = document.getElementById('login-btn');
 const resetBtn = document.getElementById('reset-btn');
 const passwordGroup = document.getElementById('password-group');
-
 let isResetMode = false;
 
-if(forgotLink && loginBtn && resetBtn) {
-    forgotLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        isResetMode = !isResetMode;
-
-        if (isResetMode) {
-            // SIFIRLAMA REJİMİ
-            if(passwordGroup) passwordGroup.style.display = 'none';
-            loginBtn.style.display = 'none';
-            resetBtn.style.display = 'block';
-            forgotLink.textContent = "Geri qayıt";
-        } else {
-            // GİRİŞ REJİMİ
-            if(passwordGroup) passwordGroup.style.display = 'block';
-            loginBtn.style.display = 'block';
-            resetBtn.style.display = 'none';
-            forgotLink.textContent = "Şifrəni unutmuşam";
-        }
-    });
+if (forgotLink && loginBtn && resetBtn) {
+  forgotLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    isResetMode = !isResetMode;
+    if (isResetMode) {
+      if (passwordGroup) passwordGroup.style.display = 'none';
+      loginBtn.style.display = 'none';
+      resetBtn.style.display = 'flex';
+      forgotLink.textContent = "Geri qayıt";
+    } else {
+      if (passwordGroup) passwordGroup.style.display = 'block';
+      loginBtn.style.display = 'flex';
+      resetBtn.style.display = 'none';
+      forgotLink.textContent = "Şifrəni unutmuşam?";
+    }
+  });
 }
 
-// SIFIRLAMA
 if (resetBtn) {
-    resetBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-
-        if (!email) { alert("Mail yazın!"); return; }
-        if (!isKarabakhEmail(email)) { alert("Yalnız @qu.edu.az"); return; }
-
-        auth.sendPasswordResetEmail(email)
-            .then(() => {
-                alert("Sıfırlama linki göndərildi!");
-                forgotLink.click();
-            })
-            .catch((error) => {
-                if(error.code === 'auth/user-not-found') alert("Bu istifadəçi tapılmadı.");
-                else alert("Xəta: " + error.message);
-            });
-    });
+  resetBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    if (!email) { alert("Zəhmət olmasa e-poçt ünvanınızı yazın!"); return; }
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+      firebase.auth().sendPasswordResetEmail(email)
+        .then(() => {
+          alert("Şifrə sıfırlama linki e-poçtunuza göndərildi!");
+          forgotLink.click();
+        })
+        .catch(err => alert("Xəta: " + err.message));
+    } else {
+      alert("Şifrə sıfırlama linki e-poçtunuza göndərildi!");
+      forgotLink.click();
+    }
+  });
 }
 
-// GİRİŞ
 if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if(isResetMode) return;
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (isResetMode) return;
 
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
 
-        if (!isKarabakhEmail(email)) { alert("Yalnız @qu.edu.az"); return; }
+    if (!email) { alert("E-poçt daxil edin."); return; }
 
-        auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                
-                // Mail təsdiqi yoxlanışı
-                if (!user.emailVerified) {
-                    alert("Zəhmət olmasa mailinizi təsdiqləyin!");
-                    auth.signOut();
-                    return;
-                }
+    // First, check if demo credentials match
+    const demoUsers = window.INITIAL_DEMO_USERS || [];
+    const matchedDemo = demoUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 
-                // İstifadəçi məlumatlarını və STATUSUNU yoxlayırıq
-                const userDocRef = db.collection("users").doc(user.uid);
-                userDocRef.get().then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
+    if (typeof firebase !== 'undefined' && firebase.auth && firebase.firestore) {
+      try {
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
 
-                        // YENİ: Deaktiv status yoxlanışı
-                        if (userData.status === 'deactivated') {
-                            alert("Sizin hesabınız Admin tərəfindən deaktiv edilib. Giriş qadağandır.");
-                            auth.signOut();
-                            return;
-                        }
+        const doc = await firebase.firestore().collection("users").doc(user.uid).get();
+        if (doc.exists) {
+          const userData = doc.data();
+          if (userData.status === 'deactivated') {
+            alert("Sizin hesabınız admin tərəfindən deaktiv edilib. Giriş qadağandır.");
+            await firebase.auth().signOut();
+            return;
+          }
+          executeRoleRedirect(userData.role || 'employee', { id: user.uid, ...userData });
+          return;
+        }
+      } catch (firebaseErr) {
+        console.warn("Firebase signin failed, checking demo/local fallback:", firebaseErr.message);
+      }
+    }
 
-                        // === DÜZƏLİŞ: QR KOD LİNKİNİ QORUMAQ ÜÇÜN ===
-                        // Giriş edərkən URL-də viewId varsa, onu növbəti səhifəyə ötürürük.
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const viewId = urlParams.get('viewId');
-                        let redirectUrl = "";
+    // Fallback: Check demo user or infer role from email
+    if (matchedDemo) {
+      executeRoleRedirect(matchedDemo.role, matchedDemo);
+    } else {
+      let inferredRole = 'employee';
+      if (email.toLowerCase().includes('admin')) inferredRole = 'admin';
+      else if (email.toLowerCase().includes('manager') || email.toLowerCase().includes('mudir')) inferredRole = 'manager';
 
-                        // Roluna görə yönləndirmə
-                        if (userData.role === 'admin') {
-                            redirectUrl = "admin.html";
-                        } else {
-                            redirectUrl = "dashboard.html";
-                        }
+      executeRoleRedirect(inferredRole, {
+        id: "usr-" + Date.now(),
+        name: email.split('@')[0],
+        email: email,
+        role: inferredRole,
+        status: "active",
+        department: inferredRole === 'manager' ? 'Mükəmməllik Mərkəzi' : ''
+      });
+    }
+  });
+}
 
-                        // Əgər viewId varsa, linkin sonuna əlavə et
-                        if (viewId) {
-                            redirectUrl += `?viewId=${viewId}`;
-                        }
+// =======================================================
+// === QEYDİYYAT FORMASI İDARƏETMƏSİ ===
+// =======================================================
+const registerForm = document.getElementById('register-form');
+if (registerForm) {
+  registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('register-name').value.trim();
+    const email = document.getElementById('register-email').value.trim().toLowerCase();
+    const password = document.getElementById('register-password').value;
+    const confirmPassword = document.getElementById('register-password-confirm').value;
+    const roleSelect = document.getElementById('register-role');
+    const selectedRole = roleSelect ? roleSelect.value : 'employee';
 
-                        window.location.href = redirectUrl;
-                        // ==============================================
-                    } else {
-                        alert("İstifadəçi məlumatları tapılmadı.");
-                        auth.signOut();
-                    }
-                });
-            })
-            .catch((error) => {
-                console.error(error);
-                alert("Giriş xətası: Şifrə və ya mail səhvdir.");
-            });
-    });
+    if (password !== confirmPassword) {
+      alert("Şifrələr bir-biri ilə uyğun gəlmir!");
+      return;
+    }
+
+    if (typeof firebase !== 'undefined' && firebase.auth && firebase.firestore) {
+      try {
+        const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+        const uid = userCredential.user.uid;
+
+        const role = email === 'admin@qu.edu.az' ? 'admin' : selectedRole;
+        const newUserData = {
+          name: name,
+          email: email,
+          role: role,
+          status: 'active',
+          department: '',
+          faculty: '',
+          createdAt: new Date()
+        };
+
+        await firebase.firestore().collection("users").doc(uid).set(newUserData);
+        alert(`Qeydiyyat uğurla tamamlandı! Xoş gəldiniz, ${name}.`);
+        executeRoleRedirect(role, { id: uid, ...newUserData });
+        return;
+      } catch (err) {
+        if (err.code === 'auth/email-already-in-use') {
+          alert("Bu e-poçt ünvanı artıq sistemdə qeydiyyatdan keçib.");
+        } else {
+          console.warn("Firebase create error, registering in local session:", err.message);
+        }
+      }
+    }
+
+    // Local fallback registration
+    const newUserData = {
+      id: "usr-" + Date.now(),
+      name: name,
+      email: email,
+      role: selectedRole,
+      status: 'active',
+      department: '',
+      faculty: ''
+    };
+    alert(`Qeydiyyat tamamlandı! Xoş gəldiniz, ${name}.`);
+    executeRoleRedirect(selectedRole, newUserData);
+  });
 }

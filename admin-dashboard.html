@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStorage - Təsərrüfat Müdiri (Admin) Paneli</title>
+    <link rel="icon" href="data:,">
+
+    <link rel="stylesheet" href="panel-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <!-- HEADER -->
+        <header class="panel-header">
+            <div class="logo" id="profile-btn">
+                <div class="logo-icon admin" id="profile-pic-header">TM</div>
+                <div class="logo-text">
+                    <span data-key="adminWelcome">Təsərrüfat Müdiri</span>
+                    <span id="admin-name-display" data-key="loading">Yüklənir...</span>
+                </div>
+            </div>
+
+            <!-- Role Switcher Test Pills -->
+            <div class="role-switch-pills">
+                <a href="admin-dashboard.html" class="role-pill active admin"><i class="fas fa-user-shield"></i> Admin Paneli</a>
+                <a href="manager-dashboard.html" class="role-pill manager"><i class="fas fa-user-tie"></i> Şöbə Müdiri</a>
+                <a href="user-dashboard.html" class="role-pill employee"><i class="fas fa-user"></i> Sıravi İşçi</a>
+            </div>
+
+            <div class="header-actions">
+                <div class="lang-switcher" id="lang-btn">
+                    <i class="fas fa-globe"></i>
+                    <span class="lang-btn-text">AZ</span>
+                    <div class="lang-dropdown" id="lang-dropdown">
+                        <a href="#" data-lang="az" data-key="langAzerbaijani">Azərbaycanca (AZ)</a>
+                        <a href="#" data-lang="en" data-key="langEnglish">English (EN)</a>
+                        <a href="#" data-lang="ru" data-key="langRussian">Русский (RU)</a>
+                    </div>
+                </div>
+                <button id="logout-btn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span data-key="logout">Çıxış</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN PANEL -->
+        <main class="panel-main">
+            <div class="panel-header-banner">
+                <div class="panel-title">
+                    <h2><i class="fas fa-shield-halved" style="color:#0284c7;"></i> <span data-key="adminPanelTitle">Təsərrüfat Müdiri (Admin) Paneli</span></h2>
+                    <span>Bütün sistemə, şöbələrə, inventara və 3-rollu personala tam nəzarət</span>
+                </div>
+                <span class="role-badge-tag admin"><i class="fas fa-key"></i> Tam Səlahiyyətli Admin</span>
+            </div>
+
+            <!-- STAT KARTLARI -->
+            <section class="stat-cards">
+                <div class="card blue">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statTotalEquipment">Ümumi Avadanlıq</span>
+                        <span class="card-value" id="stat-total">0</span>
+                        <span class="card-subtext">Sistemdəki bütün əşyalar</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-boxes-stacked"></i></div>
+                </div>
+                <div class="card green-light">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statWorking">İşlək Avadanlıq</span>
+                        <span class="card-value" id="stat-islek">0</span>
+                        <span class="card-subtext">Aktiv istifadədə</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-circle-check"></i></div>
+                </div>
+                <div class="card purple">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statHolders">İstifadəçilər (Sahiblər)</span>
+                        <span class="card-value" id="stat-holders">0</span>
+                        <span class="card-subtext">Əşya təhkim olunmuş şəxslər</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-users-viewfinder"></i></div>
+                </div>
+                <div class="card orange">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statWarehouse">Anbarda Olanlar</span>
+                        <span class="card-value" id="stat-anbar">0</span>
+                        <span class="card-subtext">Boşda / Təyin edilməmiş</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-warehouse"></i></div>
+                </div>
+            </section>
+
+            <!-- TABS CONTAINER -->
+            <section class="content-tabs">
+                <div class="tab-nav">
+                    <button class="tab-link active" data-tab="inventory-tab"><i class="fas fa-list-check"></i> <span data-key="adminTabAllInventory">İnventar Siyahısı</span></button>
+                    <button class="tab-link" data-tab="holders-tab"><i class="fas fa-network-wired"></i> <span data-key="tabHolders">Şöbələr və Sahiblər</span></button>
+                    <button class="tab-link" data-tab="users-tab"><i class="fas fa-users-gear"></i> <span data-key="adminTabUsers">Sistem Personalı və Rollar</span></button>
+                    <button class="tab-link add-btn-tab" data-tab="add-equip-tab"><i class="fas fa-plus-circle"></i> <span data-key="tabAddEquipment">Avadanlıq Əlavə Et</span></button>
+                </div>
+
+                <!-- TAB 1: ÜMUMİ İNVENTAR -->
+                <div class="tab-content active" id="inventory-tab">
+                    <div class="list-header">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="inventory-search" data-key="searchPlaceholder" placeholder="İşçi adı, Fakültə, avadanlıq adı və s...">
+                        </div>
+                        <div class="list-header-actions">
+                            <input type="file" id="import-file-input" accept=".xlsx,.xls,.csv" style="display:none;">
+                            <button type="button" class="excel-btn import-btn" id="import-excel-btn"><i class="fas fa-file-import"></i> <span data-key="btnImportExcel">Excel-dən İdxal Et</span></button>
+                            <button type="button" class="excel-btn export-btn" id="export-excel-btn"><i class="fas fa-file-export"></i> <span data-key="btnExportExcel">Excel-ə İxrac Et</span></button>
+                        </div>
+                    </div>
+
+                    <div class="filter-bar">
+                        <select id="admin-filter-faculty" class="filter-select">
+                            <option value="">Bütün Fakültələr</option>
+                            <option value="İnzibati İdarəetmə">İnzibati İdarəetmə</option>
+                            <option value="Mühəndislik">Mühəndislik və Yüksək Texnologiyalar</option>
+                            <option value="Pedaqoji">Pedaqoji</option>
+                            <option value="Humanitar və Sosial Elmlər">Humanitar və Sosial Elmlər</option>
+                            <option value="İqtisadiyyat">İqtisadiyyat</option>
+                            <option value="Rəqəmsal">Rəqəmsal</option>
+                            <option value="Anbar">Anbar</option>
+                        </select>
+                        <select id="admin-filter-status" class="filter-select">
+                            <option value="">Bütün Statuslar</option>
+                            <option value="İşlək">İşlək</option>
+                            <option value="Xarab">Xarab</option>
+                            <option value="Təmirdə">Təmirdə</option>
+                        </select>
+                    </div>
+
+                    <div class="equipment-card-list" id="all-equipment-list"></div>
+                    <div id="all-empty-state" class="empty-state" style="display: none;">
+                        <i class="fas fa-box-open"></i>
+                        <h3 data-key="emptyStateInventory">Sistemdə heç bir avadanlıq tapılmadı.</h3>
+                    </div>
+                </div>
+
+                <!-- TAB 2: ŞÖBƏLƏR VƏ SAHİBLƏR -->
+                <div class="tab-content" id="holders-tab">
+                    <div class="list-header">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="holders-search" data-key="searchHoldersPlaceholder" placeholder="İstifadəçi adı və ya fakültə axtar...">
+                        </div>
+                    </div>
+                    <div class="holder-card-list" id="all-holders-list"></div>
+                    <div id="holders-empty-state" class="empty-state" style="display: none;">
+                        <i class="fas fa-users-slash"></i>
+                        <h3 data-key="emptyStateHolders">Heç bir istifadəçi tapılmadı.</h3>
+                    </div>
+                </div>
+
+                <!-- TAB 3: SİSTEM PERSONALİ & 3-ROL İDARƏETMƏSİ -->
+                <div class="tab-content" id="users-tab">
+                    <div class="list-header">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="user-search" data-key="searchUsersPlaceholder" placeholder="Ad, e-poçt və ya rola görə axtar...">
+                        </div>
+                        <button class="action-header-btn btn-new-user" id="add-user-btn"><i class="fas fa-user-plus"></i> <span data-key="addUser">Yeni Personal Yarat</span></button>
+                    </div>
+                    <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13px; color:#166534; display:flex; align-items:center; gap:10px;">
+                        <i class="fas fa-circle-info" style="font-size:16px;"></i>
+                        <span>Aşağıdakı kartlar vasitəsilə istənilən personalın rolunu dərhal dəyişə bilərsiniz: <b>🔑 Admin</b> (Təsərrüfat Müdiri), <b>👔 Şöbə Müdiri</b> (Departament Rəhbəri) və ya <b>👤 Sıravi İşçi</b>.</span>
+                    </div>
+                    <div class="user-card-list" id="all-users-list"></div>
+                </div>
+
+                <!-- TAB 4: AVADANLIQ ƏLAVƏ ET FORMASI -->
+                <div class="tab-content" id="add-equip-tab">
+                    <section class="form-container">
+                        <form id="admin-add-equipment-form" class="equipment-form">
+                            <div class="holder-info-group">
+                                <span class="holder-info-title"><i class="fas fa-user-check"></i> <span data-key="lblHolderTitle">Avadanlıq Sahibinin Məlumatları</span></span>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="holder-name" data-key="lblHolderName">Ad Soyad *</label>
+                                        <input type="text" id="holder-name" list="holder-suggestions" autocomplete="off" placeholder="məs: Məmməd Məmmədli" required>
+                                        <datalist id="holder-suggestions"></datalist>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="holder-faculty" data-key="lblHolderFaculty">Fakültə / Departament *</label>
+                                        <select id="holder-faculty" required>
+                                            <option value="" disabled selected data-key="formTypeSelect">Seçin</option>
+                                            <option value="İnzibati İdarəetmə">İnzibati İdarəetmə</option>
+                                            <option value="Mühəndislik">Mühəndislik və Yüksək Texnologiyalar</option>
+                                            <option value="Pedaqoji">Pedaqoji</option>
+                                            <option value="Humanitar və Sosial Elmlər">Humanitar və Sosial Elmlər</option>
+                                            <option value="İqtisadiyyat">İqtisadiyyat</option>
+                                            <option value="İncəsənət">İncəsənət</option>
+                                            <option value="Rəqəmsal">Rəqəmsal</option>
+                                            <option value="Tibb">Tibb</option>
+                                            <option value="Digər">Digər</option>
+                                        </select>
+                                        <input type="text" id="other-faculty-input" placeholder="Fakültə adını yazın..." style="display: none; margin-top: 6px;">
+                                    </div>
+                                    <div class="form-group full-width" id="holder-department-group" style="display: none;">
+                                        <label for="holder-department" data-key="lblHolderDepartment">Şöbə / Mərkəz *</label>
+                                        <select id="holder-department">
+                                            <option value="" disabled selected data-key="deptSelectPlaceholder">Əvvəlcə Fakültə seçin</option>
+                                        </select>
+                                        <input type="text" id="other-department-input" placeholder="Şöbə adını yazın..." style="display: none; margin-top: 6px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="auto-id" data-key="lblSystemID">Sistem ID (Avtomatik & Dəyişməz)</label>
+                                    <input type="text" id="auto-id" readonly style="background-color: #f1f5f9; font-weight: 700; color: #0284c7; letter-spacing: 1px;">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="admin-equip-type" data-key="formType">Avadanlıq növü *</label>
+                                    <select id="admin-equip-type" required>
+                                        <option value="" disabled selected data-key="formTypeSelect">Növü seçin</option>
+                                        <option value="Kompüter">Kompüter</option>
+                                        <option value="Monitor">Monitor</option>
+                                        <option value="Printer">Printer</option>
+                                        <option value="Şəbəkə Avadanlığı">Şəbəkə Avadanlığı</option>
+                                        <option value="Masa">Masa</option>
+                                        <option value="Lövhə">Lövhə</option>
+                                        <option value="Stul">Stul</option>
+                                        <option value="Şkaf">Şkaf</option>
+                                        <option value="Dolab">Dolab</option>
+                                        <option value="Digər">Digər</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="admin-equip-name" data-key="formName">Avadanlığın adı *</label>
+                                    <input type="text" id="admin-equip-name" data-key="formNamePlaceholder" placeholder="məs: Dell Latitude Laptop" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row" id="subtype-field-group" style="display: none;">
+                                <div class="form-group full-width">
+                                    <label for="admin-equip-subtype" data-key="lblEquipSubtype">Növ / Alt Növ *</label>
+                                    <select id="admin-equip-subtype">
+                                        <option value="" disabled selected data-key="subtypeSelectPlaceholder">Əvvəlcə avadanlıq növünü seçin</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="admin-equip-model" data-key="formModel">Marka/Model *</label>
+                                    <input type="text" id="admin-equip-model" list="brand-suggestions" data-key="formModelPlaceholder" placeholder="məs: Dell Latitude 5420" required>
+                                    <datalist id="brand-suggestions">
+                                        <option value="HP"><option value="Acer"><option value="Dell"><option value="Lenovo"><option value="Asus"><option value="Canon"><option value="Epson"><option value="Samsung"><option value="Apple">
+                                    </datalist>
+                                </div>
+                                <div class="form-group" id="serial-field-group">
+                                    <label for="admin-equip-serial" data-key="formSerial">Serial Nömrə</label>
+                                    <input type="text" id="admin-equip-serial" data-key="formSerialPlaceholder" placeholder="məs: SN123456789">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group" id="mac-field-group">
+                                    <label for="admin-equip-mac" data-key="formMac">MAC Address</label>
+                                    <input type="text" id="admin-equip-mac" data-key="formMacPlaceholder" placeholder="məs: 00:1A:2B:3C:4D:5E">
+                                </div>
+                                <div class="form-group">
+                                    <label for="admin-equip-status" data-key="formStatus">Status *</label>
+                                    <select id="admin-equip-status" required>
+                                        <option value="İşlək" data-key="formStatusWorking">İşlək</option>
+                                        <option value="Xarab" data-key="formStatusBroken">Xarab</option>
+                                        <option value="Təmirdə" data-key="formStatusRepair">Təmirdə</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="admin-equip-date" data-key="formDate">Alınma Tarixi</label>
+                                    <input type="date" id="admin-equip-date">
+                                </div>
+                                <div class="form-group">
+                                    <label for="admin-equip-file" data-key="formUpload">Şəkil Yüklə</label>
+                                    <input type="file" id="admin-equip-file" accept="image/*">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="admin-equip-notes" data-key="formNotes">Qeyd/Şərh</label>
+                                    <textarea id="admin-equip-notes" data-key="formNotesPlaceholder" placeholder="Əlavə məlumat, xüsusi qeydlər..."></textarea>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn"><i class="fas fa-save"></i> <span data-key="submitAssignEquipment">Yadda Saxla</span></button>
+                        </form>
+                    </section>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL: ŞÖBƏ TƏYİNİ (ŞÖBƏ MÜDİRİ ROLU SEÇİLƏNDƏ) -->
+    <div id="assign-dept-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 440px;">
+            <button class="modal-close-btn" id="assign-dept-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <h2><i class="fas fa-user-tie" style="color:#9333ea;"></i> Şöbə Müdiri Təyini</h2>
+            </div>
+            <div class="modal-body">
+                <p id="assign-dept-desc" style="font-size:13px; color:#64748b; margin-top:0;">Bu istifadəçiyə rəhbərlik edəcəyi Şöbə və ya Mərkəzi seçin:</p>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label>Fakültə / Departament</label>
+                    <select id="modal-dept-faculty" required>
+                        <option value="İnzibati İdarəetmə">İnzibati İdarəetmə</option>
+                        <option value="Mühəndislik">Mühəndislik</option>
+                        <option value="Pedaqoji">Pedaqoji</option>
+                        <option value="Humanitar və Sosial Elmlər">Humanitar və Sosial Elmlər</option>
+                        <option value="İqtisadiyyat">İqtisadiyyat</option>
+                        <option value="Rəqəmsal">Rəqəmsal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Şöbə / Mərkəz *</label>
+                    <select id="modal-dept-select" required></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="action-btn" id="assign-dept-cancel">Ləğv</button>
+                <button type="button" class="submit-btn" id="assign-dept-confirm" style="margin-top:0; width:auto; padding:8px 16px; background:#9333ea;">Təsdiqlə və Rolu Yenilə</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: YENİ PERSONAL YARAT (3 ROL İLƏ) -->
+    <div id="add-user-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 480px;">
+            <button class="modal-close-btn" id="add-user-modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2><i class="fas fa-user-plus" style="color:#0284c7;"></i> <span data-key="addUserTitle">Yeni Personal Yarat</span></h2></div>
+            <form id="add-user-form">
+                <div class="modal-body" style="display:flex; flex-direction:column; gap:12px;">
+                    <p data-key="addUserP" style="font-size: 13px; color: #64748b; margin: 0 0 4px 0;">Sistemə giriş edəcək yeni əməkdaş</p>
+                    <div class="form-group"><label for="new-user-name" data-key="fullNameLabel">Tam ad *</label><input type="text" id="new-user-name" placeholder="məs: Əli Əliyev" required></div>
+                    <div class="form-group"><label for="new-user-email" data-key="emailLabel">E-poçt ünvanı *</label><input type="email" id="new-user-email" placeholder="ali@qu.edu.az" required></div>
+                    <div class="form-group"><label for="new-user-password" data-key="initialPassword">İlkin Şifrə *</label><input type="password" id="new-user-password" required placeholder="••••••••"></div>
+                    
+                    <div class="form-group">
+                        <label for="new-user-role"><i class="fas fa-id-badge"></i> Rol Seçimi *</label>
+                        <select id="new-user-role" required>
+                            <option value="employee" selected>👤 Sıravi İşçi (Yalnız şəxsi inventar)</option>
+                            <option value="manager">👔 Şöbə Müdiri (Şöbə daxili inventar & işçilər)</option>
+                            <option value="admin">🔑 Təsərrüfat Müdiri (Tam Admin İcazəsi)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="new-user-dept-wrap">
+                        <label for="new-user-department"><i class="fas fa-building"></i> Şöbə / Mərkəz</label>
+                        <select id="new-user-department">
+                            <option value="Mükəmməllik Mərkəzi">Mükəmməllik Mərkəzi</option>
+                            <option value="Kompüter Mühəndisliyi Şöbəsi">Kompüter Mühəndisliyi Şöbəsi</option>
+                            <option value="Rəqəmsal Tələbələrlə İş Mərkəzi">Rəqəmsal Tələbələrlə İş Mərkəzi</option>
+                            <option value="İnformasiya Texnologiyaları Şöbəsi">İnformasiya Texnologiyaları Şöbəsi</option>
+                            <option value="Təsərrüfat və Maddi-Texniki Təminat Şöbəsi">Təsərrüfat və Maddi-Texniki Təminat Şöbəsi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="action-btn" id="add-user-cancel-btn" data-key="cancel">Ləğv et</button>
+                    <button type="submit" class="submit-btn" style="margin-top:0; width:auto; padding:8px 18px;" data-key="save">Yarat</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PROFİL & ŞİFRƏ -->
+    <div id="profile-modal" class="modal-overlay">
+        <div class="modal-content profile-modal">
+            <button class="modal-close-btn" id="profile-modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 data-key="profileSettings">Profil Parametrləri</h2></div>
+            <form id="profile-settings-form">
+                <div class="modal-body">
+                    <div class="profile-pic-wrapper">
+                        <div class="profile-pic" id="profile-pic-modal">TM
+                            <label for="profile-pic-upload" class="upload-btn"><i class="fas fa-camera"></i></label>
+                            <input type="file" id="profile-pic-upload" accept="image/*" style="display:none;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:12px;"><label for="profile-name" data-key="fullNameLabel">Tam ad</label><input type="text" id="profile-name" required></div>
+                    <div class="form-group" style="margin-bottom:12px;"><label for="profile-email" data-key="emailLabel">E-poçt ünvanı</label><input type="email" id="profile-email" disabled></div>
+                    <button type="button" class="action-btn" id="change-password-btn-open" style="width:100%; padding:10px; justify-content:center;"><i class="fas fa-lock"></i> <span data-key="changePassword">Şifrəni Dəyiş</span></button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="action-btn" id="profile-cancel-btn" data-key="cancel">Ləğv et</button>
+                    <button type="submit" class="submit-btn" style="margin-top:0; width:auto;" data-key="updateProfile">Profili Yenilə</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ŞİFRƏ DƏYİŞDİRMƏ -->
+    <div id="change-password-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <button class="modal-close-btn" id="password-modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 data-key="changePassword">Şifrəni Dəyiş</h2></div>
+            <form id="change-password-form">
+                <div class="modal-body" style="display:flex; flex-direction:column; gap:12px;">
+                    <div class="form-group"><label>Köhnə şifrə</label><input type="password" id="old-password" required placeholder="••••••••"></div>
+                    <div class="form-group"><label>Yeni şifrə</label><input type="password" id="new-password" required placeholder="••••••••"></div>
+                    <div class="form-group"><label>Yeni şifrəni təsdiqlə</label><input type="password" id="confirm-new-password" required placeholder="••••••••"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="action-btn" id="password-cancel-btn">Ləğv et</button>
+                    <button type="submit" class="submit-btn" style="margin-top:0; width:auto;">Şifrəni Yenilə</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: İSTİFADƏÇİ AVADANLIQLARI -->
+    <div id="view-equipment-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 850px;">
+            <button class="modal-close-btn" id="view-equipment-close-btn"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <h2><span id="view-equip-holder-name"></span> - <span data-key="viewInventory">Avadanlıq Siyahısı</span></h2>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Adı / Model</th>
+                                <th>Status</th>
+                                <th>Serial Nömrə</th>
+                                <th>Sistem ID</th>
+                                <th>Əməliyyatlar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-specific-equipment-tbody"></tbody>
+                    </table>
+                </div>
+                <div id="user-specific-empty-state" class="empty-state" style="display: none;">
+                    <i class="fas fa-box-open"></i>
+                    <h3>Bu istifadəçi üçün heç bir avadanlıq tapılmadı.</h3>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="action-btn" id="view-equipment-close-footer-btn" data-key="close">Bağla</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DETALLI BAXIŞ -->
+    <div id="item-details-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 540px;">
+            <button class="modal-close-btn" id="item-details-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 data-key="equipmentDetails">Avadanlıq Məlumatları</h2></div>
+            <div class="modal-body">
+                <div class="details-grid" id="item-details-content"></div>
+                <div id="item-image-container" style="margin-top:12px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submit-btn" id="item-details-ok" style="margin-top:0; width:auto;" data-key="okBtn">Oldu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: QR KOD -->
+    <div id="qr-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 360px; text-align: center;">
+            <button class="modal-close-btn" onclick="document.getElementById('qr-modal').style.display='none'"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2><i class="fas fa-qrcode"></i> QR Kod</h2></div>
+            <div class="modal-body" style="display: flex; flex-direction: column; align-items: center;">
+                <div id="qrcode" class="qr-code-section"></div>
+                <button type="button" class="submit-btn" onclick="downloadQR()" style="margin-top: 15px; width: 100%;">
+                    <i class="fas fa-download"></i> QR Kodu Yüklə (PNG)
+                </button>
+                <p id="qr-link-text" style="font-size:11px; word-break:break-all; color:#94a3b8; margin-top:8px;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AVADANLIĞI DÜZƏLT -->
+    <div id="edit-equipment-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 560px;">
+            <button class="modal-close-btn" id="edit-equipment-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 data-key="editEquipmentTitle">Avadanlığı Düzəlt / Köçür</h2></div>
+            <form id="edit-equipment-form">
+                <div class="modal-body">
+                    <input type="hidden" id="edit-equip-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-key="lblHolderName">Ad Soyad</label>
+                            <input type="text" id="edit-holder-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-key="lblHolderFaculty">Fakültə / Departament</label>
+                            <select id="edit-holder-faculty" required>
+                                <option value="İnzibati İdarəetmə">İnzibati İdarəetmə</option>
+                                <option value="Mühəndislik">Mühəndislik</option>
+                                <option value="Pedaqoji">Pedaqoji</option>
+                                <option value="Humanitar və Sosial Elmlər">Humanitar və Sosial Elmlər</option>
+                                <option value="İqtisadiyyat">İqtisadiyyat</option>
+                                <option value="Rəqəmsal">Rəqəmsal</option>
+                                <option value="Anbar">Anbar</option>
+                                <option value="Digər">Digər</option>
+                            </select>
+                            <input type="text" id="edit-other-faculty-input" placeholder="Fakültə adını yazın..." style="display: none; margin-top: 5px;">
+                        </div>
+                        <div class="form-group full-width" id="edit-holder-department-group" style="display: none;">
+                            <label for="edit-holder-department" data-key="lblHolderDepartment">Şöbə / Mərkəz</label>
+                            <select id="edit-holder-department"></select>
+                            <input type="text" id="edit-other-department-input" placeholder="Şöbə adını yazın..." style="display: none; margin-top: 5px;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-key="formType">Avadanlıq növü</label>
+                            <select id="edit-equip-type" required>
+                                <option value="Kompüter">Kompüter</option>
+                                <option value="Monitor">Monitor</option>
+                                <option value="Printer">Printer</option>
+                                <option value="Şəbəkə Avadanlığı">Şəbəkə Avadanlığı</option>
+                                <option value="Masa">Masa</option>
+                                <option value="Lövhə">Lövhə</option>
+                                <option value="Stul">Stul</option>
+                                <option value="Şkaf">Şkaf</option>
+                                <option value="Dolab">Dolab</option>
+                                <option value="Digər">Digər</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label data-key="formName">Avadanlığın adı</label>
+                            <input type="text" id="edit-equip-name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row" id="edit-subtype-field-group" style="display: none;">
+                        <div class="form-group full-width">
+                            <label for="edit-equip-subtype" data-key="lblEquipSubtype">Növ / Alt Növ</label>
+                            <select id="edit-equip-subtype"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label data-key="formModel">Marka/Model</label>
+                            <input type="text" id="edit-equip-model" list="brand-suggestions" required>
+                        </div>
+                        <div class="form-group" id="edit-serial-field-group">
+                            <label data-key="formSerial">Serial Nömrə</label>
+                            <input type="text" id="edit-equip-serial">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" id="edit-mac-field-group">
+                            <label data-key="formMac">MAC Address</label>
+                            <input type="text" id="edit-equip-mac">
+                        </div>
+                        <div class="form-group">
+                            <label data-key="formStatus">Status</label>
+                            <select id="edit-equip-status">
+                                <option value="İşlək">İşlək</option>
+                                <option value="Xarab">Xarab</option>
+                                <option value="Təmirdə">Təmirdə</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label data-key="formNotes">Qeyd/Şərh</label>
+                        <textarea id="edit-equip-notes"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="justify-content: space-between;">
+                    <button type="button" class="action-btn" id="btn-return-warehouse" style="background:#fef3c7; color:#d97706;" title="Anbara Qaytar"><i class="fas fa-warehouse"></i> <span data-key="returnToWarehouse">Anbar</span></button>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="action-btn" id="delete-equipment-btn" style="background:#fee2e2; color:#ef4444;" title="Avadanlığı Sil"><i class="fas fa-trash-alt"></i></button>
+                        <button type="button" class="action-btn" id="edit-equipment-cancel" data-key="cancel">Ləğv</button>
+                        <button type="submit" class="submit-btn" style="margin-top:0; width:auto;" data-key="save">Yadda Saxla</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EXCEL İDXAL PREVIEW -->
+    <div id="import-preview-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 820px;">
+            <button class="modal-close-btn" id="import-preview-close-btn"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2><i class="fas fa-file-excel" style="color:#10b981;"></i> <span data-key="importPreviewTitle">Excel İdxalına Baxış</span></h2></div>
+            <div class="modal-body">
+                <div style="display:flex; gap:12px; margin-bottom:16px;">
+                    <div style="flex:1; background:#f8fafc; padding:12px; border-radius:8px; text-align:center;"><span style="font-size:20px; font-weight:800;" id="import-total-count">0</span><br><span style="font-size:12px; color:#64748b;">Ümumi Sətir</span></div>
+                    <div style="flex:1; background:#ecfdf5; padding:12px; border-radius:8px; text-align:center;"><span style="font-size:20px; font-weight:800; color:#059669;" id="import-valid-count">0</span><br><span style="font-size:12px; color:#059669;">Düzgün</span></div>
+                    <div style="flex:1; background:#fef2f2; padding:12px; border-radius:8px; text-align:center;"><span style="font-size:20px; font-weight:800; color:#dc2626;" id="import-invalid-count">0</span><br><span style="font-size:12px; color:#dc2626;">Xətalı</span></div>
+                </div>
+                <div class="table-responsive" style="max-height: 280px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Növ</th>
+                                <th>Ad</th>
+                                <th>Marka/Model</th>
+                                <th>Status</th>
+                                <th>Sahib</th>
+                                <th>Fakültə</th>
+                            </tr>
+                        </thead>
+                        <tbody id="import-preview-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="action-btn" id="import-preview-cancel-btn" data-key="cancel">Ləğv et</button>
+                <button type="button" class="submit-btn" id="import-preview-confirm-btn" style="margin-top:0; width:auto;"><i class="fas fa-upload"></i> <span data-key="importConfirmBtn">Sistemə Yüklə</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <!-- Modul Skriptlər -->
+    <script src="firebase-config.js"></script>
+    <script src="i18n.js"></script>
+    <script src="admin-app.js"></script>
+</body>
+</html>
