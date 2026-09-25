@@ -1,14 +1,8 @@
-// === FIREBASE CONFIG ==='''
-const firebaseConfig = {
-  apiKey: "AIzaSyCMmJNA8aj906l-x07XzMkgpLhBk2a0j_E",
-  authDomain: "smartstorage-62517.firebaseapp.com",
-  projectId: "smartstorage-62517",
-  storageBucket: "smartstorage-62517.firebasestorage.app",
-  messagingSenderId: "385539276000",
-  appId: "1:385539276000:web:74fbf3e8df18137540a485",
-  measurementId: "G-MCP6LZHN9K"
-};
-
+// === FIREBASE CONFIG ===
+// Konfiqurasiya artıq bu fayldan çıxarılıb və config.js-də saxlanılır.
+// Bu faylı yükləyən HTML səhifəsində, script.js-dən ƏVVƏL aşağıdakı sətri əlavə et:
+//   <script src="config.js"></script>
+// (firebaseConfig qlobal dəyişəni oradan gəlir.)
 
 try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error(e); }
 const auth = firebase.auth();
