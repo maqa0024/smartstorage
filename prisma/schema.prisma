@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  isVerified  Boolean  @default(false) @map("is_verified")
+  passwordHash String? @map("password_hash")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  userDevices UserDevice[]
+  otpCodes    OtpCode[]
+  auditLogs   AuditLog[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Device {
+  id         String   @id @default(uuid())
+  deviceName String   @map("device_name")
+  deviceType String?  @map("device_type")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  userDevices UserDevice[]
+
+  @@map("devices")
+}
+
+model UserDevice {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  deviceId   String   @map("device_id")
+  linkedAt   DateTime @default(now()) @map("linked_at")
+  lastActive DateTime? @map("last_active")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceId])
+  @@map("user_devices")
+}
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  code      String
+  expiresAt DateTime @map("expires_at")
+  isUsed    Boolean  @default(false) @map("is_used")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("otp_codes")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  action    String
+  ipAddress String?  @map("ip_address")
+  details   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("audit_logs")
+}
