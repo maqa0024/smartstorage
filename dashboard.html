@@ -574,6 +574,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="config.js"></script>
     
     <script>
         // === TƏRCÜMƏ SİSTEMİ ===
@@ -639,7 +640,8 @@
                 formTypeComputer: "Kompüter",
                 formTypeMonitor: "Monitor",
                 formTypePrinter: "Printer",
-                formTypeŞkaf :"Şkaf",
+                formTypeŞkaf: "Şkaf",
+                formTypeMasa: "Masa",
                 formTypeOther: "Digər",
                 filterAllTypes: "Bütün Növlər",
                 filterAllStatuses: "Bütün Statuslar",
@@ -685,6 +687,8 @@
                 formTypeComputer: "Computer",
                 formTypeMonitor: "Monitor",
                 formTypePrinter: "Printer",
+                formTypeŞkaf: "Wardrobe",
+                formTypeMasa: "Desk",
                 formTypeOther: "Other",
                 filterAllTypes: "All Types",
                 filterAllStatuses: "All Statuses",
@@ -730,6 +734,8 @@
                 formTypeComputer: "Компьютер",
                 formTypeMonitor: "Монитор",
                 formTypePrinter: "Принтер",
+                formTypeŞkaf: "Шкаф",
+                formTypeMasa: "Стол",
                 formTypeOther: "Другое",
                 filterAllTypes: "Все типы",
                 filterAllStatuses: "Все статусы",
@@ -777,16 +783,7 @@
         }
 
         // === FIREBASE ===
-        const firebaseConfig = {
-            apiKey: "AIzaSyCMmJNA8aj906l-x07XzMkgpLhBk2a0j_E",
-  authDomain: "smartstorage-62517.firebaseapp.com",
-  projectId: "smartstorage-62517",
-  storageBucket: "smartstorage-62517.firebasestorage.app",
-  messagingSenderId: "385539276000",
-  appId: "1:385539276000:web:74fbf3e8df18137540a485",
-  measurementId: "G-MCP6LZHN9K"
-        };
-        
+        // firebaseConfig indi config.js-dən gəlir (yuxarıdakı <script src="config.js">).
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();

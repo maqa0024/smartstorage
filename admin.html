@@ -719,6 +719,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="config.js"></script>
     
     <script>
         // === TƏRCÜMƏ SİSTEMİ ===
@@ -850,10 +851,8 @@
                  formTypeComputer: "Computer",
                  formTypeMonitor: "Monitor",
                  formTypePrinter: "Printer",
-                 /* Qeyd 
-                 Şkaf 
-                 MAsa 
-                 in english */
+                 formTypeŞkaf: "Wardrobe",
+                 formTypeMasa: "Desk",
                  formTypeOther: "Other",
                  formName: "Equipment Name *",
                  formModel: "Brand/Model *",
@@ -927,10 +926,8 @@
                  errorAddingEquipment: "Error occurred!",
                  userCreateSuccess: "User created!",
                  userCreateError: "Error: ",
-                 confirmDeleteEquipment: "Are you sure you want to delete this?",
                  confirmDeleteEquipment: "Are you sure you want to delete this equipment?",
                  deleteEquipment: "Delete equipment",
-
             },
             ru: {
                  appName: "SmartStorage Инвентарь",
@@ -954,10 +951,8 @@
                  formTypeComputer: "Компьютер",
                  formTypeMonitor: "Монитор",
                  formTypePrinter: "Принтер",
-                 /* Qeyd 
-                  skaf
-                 masa
-                 rusca yazilmalidir burda */
+                 formTypeŞkaf: "Шкаф",
+                 formTypeMasa: "Стол",
                  formTypeOther: "Другое",
                  formName: "Название *",
                  formModel: "Модель *",
@@ -1032,6 +1027,7 @@
                  userCreateSuccess: "Пользователь создан!",
                  userCreateError: "Ошибка: ",
                  confirmDeleteEquipment: "Удалить это оборудование?",
+                 deleteEquipment: "Удалить оборудование",
             }
         };
 
@@ -1102,19 +1098,8 @@
             "Broken": "formStatusBroken",
             "Repair": "formStatusRepair"
         };
-// Data api si burdadir deyis bunu 
-        // === FIREBASE CONFIG ===
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyCMmJNA8aj906l-x07XzMkgpLhBk2a0j_E",
-  authDomain: "smartstorage-62517.firebaseapp.com",
-  projectId: "smartstorage-62517",
-  storageBucket: "smartstorage-62517.firebasestorage.app",
-  messagingSenderId: "385539276000",
-  appId: "1:385539276000:web:74fbf3e8df18137540a485",
-  measurementId: "G-MCP6LZHN9K"
-        };
-        
+        // === FIREBASE ===
+        // firebaseConfig indi config.js-dən gəlir (yuxarıdakı <script src="config.js">).
         firebase.initializeApp(firebaseConfig);
         const secondaryApp = firebase.initializeApp(firebaseConfig, "secondary");
         const auth = firebase.auth();
