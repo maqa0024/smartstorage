@@ -1,21 +1,20 @@
-🏢 **SmartStorage - Anbar və İnventar İdarəetmə Sistemi**
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
-**Canlı Demo:** https://maqa0024.github.io/smartstorage/
+# Run and deploy your AI Studio app
 
-SmartStorage, təşkilat və müəssisələrin daxilində olan mal-materialların, texniki vasitələrin və ehtiyat hissələrinin hərəkətini, sayını və yerləşməsini rəqəmsal mühitdə izləmək üçün nəzərdə tutulmuş müasir idarəetmə həllidir. Sistem ənənəvi əl ilə aparılan qeydiyyatı tamamilə ləğv edərək, resursların təhlükəsiz saxlanılmasını və əməliyyatların anında icrasını təmin edir.
+This contains everything you need to run your app locally.
 
-🎯 **Layihənin Məqsədi**
+View your app in AI Studio: https://ai.studio/apps/f41b0229-365e-467f-81d2-ae789243754c
 
-* **Resursların Optimize Edilməsi:** Anbardakı məhsul və avadanlıq ehtiyatlarının vahid platformada tam nəzarətə götürülməsi.
-* **Hərəkət İzlənməsi:** Anbara daxil olan və çıxan hər bir resursun dəqiq tarixçəsinin aparılması.
-* **İtkilərin Qarşısının Alınması:** İtmiş, müddəti keçmiş və ya zədələnmiş inventarların anında təsbit edilməsi.
+## Run Locally
 
-🌟 **Əsas Özəlliklər**
+**Prerequisites:**  Node.js
 
-* 📦 **Modul Qeydiyyatı:** Yeni məhsul və avadanlıqların (barkod, kateqoriya, miqdar, anbar zonası üzrə) sistemə daxil edilməsi.
-* 📊 **Analitik Panel:** Anbardakı ümumi ehtiyatların vəziyyətini, kritik minimum həddə düşən malları real vaxt rejimində göstərən vizual diaqramlar.
-* 🔍 **Ağıllı Axtarış və Çeşidləmə:** Məhsulları koda, kateqoriyaya, məsul şəxsə və ya saxlanc zonasına görə anında tapmaq imkanı.
-* 🛡️ **Çoxsəviyyəli Giriş və Təhlükəsizlik:** Fərqli istifadəçi rolları (Admin, Anbardar, Menecer) üçün nəzərdə tutulmuş, Firebase Authentication platforması ilə qorunan idarəetmə paneli.
-* 📲 **Mobil Adaptasiya:** İkiölçülü interfeys sayəsində planşet, mobil və daxili skaner cihazlarından rahat istifadə.
-* 🔔 **Kritik Ehtiyat Bildirişləri:** Anbarda hər hansı malın bitmək üzrə olduğunu bildirən avtomatik xəbərdarlıq sistemi.
-* 📑 **Hesabatlıq və Eksport:** Keçirilmiş əməliyyatların və mövcud inventarın PDF/Excel formatında avtomatik hesabatının çıxarılması.
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

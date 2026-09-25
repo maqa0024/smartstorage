@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStorage - Sıravi İşçi (Əməkdaş) Paneli</title>
+    <link rel="icon" href="data:,">
+
+    <link rel="stylesheet" href="panel-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <!-- HEADER -->
+        <header class="panel-header">
+            <div class="logo" id="profile-btn">
+                <div class="logo-icon employee" id="profile-pic-header">ƏM</div>
+                <div class="logo-text">
+                    <span data-key="userWelcome">Əməkdaş Paneli</span>
+                    <span id="user-name-display" data-key="loading">Yüklənir...</span>
+                </div>
+            </div>
+
+            <!-- Role Switcher Test Pills -->
+            <div class="role-switch-pills">
+                <a href="admin-dashboard.html" class="role-pill admin"><i class="fas fa-user-shield"></i> Admin Paneli</a>
+                <a href="manager-dashboard.html" class="role-pill manager"><i class="fas fa-user-tie"></i> Şöbə Müdiri</a>
+                <a href="user-dashboard.html" class="role-pill active employee"><i class="fas fa-user"></i> Sıravi İşçi</a>
+            </div>
+
+            <div class="header-actions">
+                <div class="lang-switcher" id="lang-btn">
+                    <i class="fas fa-globe"></i>
+                    <span class="lang-btn-text">AZ</span>
+                    <div class="lang-dropdown" id="lang-dropdown">
+                        <a href="#" data-lang="az" data-key="langAzerbaijani">Azərbaycanca (AZ)</a>
+                        <a href="#" data-lang="en" data-key="langEnglish">English (EN)</a>
+                        <a href="#" data-lang="ru" data-key="langRussian">Русский (RU)</a>
+                    </div>
+                </div>
+                <button id="logout-btn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span data-key="logout">Çıxış</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN PANEL -->
+        <main class="panel-main">
+            <!-- PERSONAL WELCOME BANNER -->
+            <div class="panel-header-banner" style="border-left: 4px solid #059669;">
+                <div class="panel-title">
+                    <h2><i class="fas fa-user-check" style="color:#059669;"></i> <span id="personal-welcome-title">Mənim Şəxsi İnventarım</span></h2>
+                    <span>Sizə təhkim olunmuş bütün avadanlıqlar, maddi-texniki təminat və QR kodlar</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="role-badge-tag employee"><i class="fas fa-user"></i> Sıravi Əməkdaş</span>
+                    <select id="user-switch-test" class="filter-select" style="border-color:#86efac;">
+                        <option value="Aysel Qasımova" selected>Aysel Qasımova (Mükəmməllik Mərkəzi)</option>
+                        <option value="Rəşad Əliyev">Rəşad Əliyev (Kompüter Mühəndisliyi)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- STAT KARTLARI (YALNIZ BU İŞÇİ ÜÇÜN) -->
+            <section class="stat-cards">
+                <div class="card green">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statMyEquipment">Mənə Təhkim Olunan</span>
+                        <span class="card-value" id="stat-my-total">0</span>
+                        <span class="card-subtext">Cəmi istifadənizdə olan</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-laptop-file"></i></div>
+                </div>
+                <div class="card green-light">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statWorking">İşlək Vəziyyətdə</span>
+                        <span class="card-value" id="stat-my-islek">0</span>
+                        <span class="card-subtext">Hazırda saz olan</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-circle-check"></i></div>
+                </div>
+                <div class="card red">
+                    <div class="card-info">
+                        <span class="card-title" data-key="statBroken">Təmir / Nasaz</span>
+                        <span class="card-value" id="stat-my-xarab">0</span>
+                        <span class="card-subtext">Baxış tələb edən</span>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-screwdriver-wrench"></i></div>
+                </div>
+            </section>
+
+            <!-- TABS CONTAINER -->
+            <section class="content-tabs">
+                <div class="tab-nav">
+                    <button class="tab-link active user-theme" data-tab="my-inventory-tab"><i class="fas fa-list-check"></i> <span data-key="tabMyInventory">Mənim İnventarım</span></button>
+                    <button class="tab-link user-theme" data-tab="report-issue-tab"><i class="fas fa-triangle-exclamation"></i> <span data-key="tabReportIssue">Nasazlıq / Təmir Müraciəti</span></button>
+                </div>
+
+                <!-- TAB 1: MƏNİM İNVENTARIM -->
+                <div class="tab-content active" id="my-inventory-tab">
+                    <div class="list-header">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="my-inv-search" placeholder="Şəxsi avadanlıqlarınızda axtarış...">
+                        </div>
+                    </div>
+
+                    <div class="equipment-card-list" id="my-equipment-list"></div>
+                    <div id="my-empty-state" class="empty-state" style="display: none;">
+                        <i class="fas fa-box-open"></i>
+                        <h3>Sizə hələlik heç bir avadanlıq təhkim edilməyib.</h3>
+                        <p style="font-size:13px; color:#64748b;">Avadanlıq təhkim edilməsi üçün şöbə müdiriniz və ya təsərrüfat müdirinə müraciət edin.</p>
+                    </div>
+                </div>
+
+                <!-- TAB 2: NASAZLIQ BİLDİRİŞİ -->
+                <div class="tab-content" id="report-issue-tab">
+                    <section class="form-container">
+                        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:16px; margin-bottom:20px;">
+                            <h4 style="margin:0 0 6px 0; color:#92400e; font-size:15px;"><i class="fas fa-triangle-exclamation"></i> Nasazlıq və ya Texniki Dəstək Müraciəti</h4>
+                            <p style="margin:0; font-size:13px; color:#b45309;">İstifadənizdə olan avadanlıqda yaranan problemləri qeyd edin. Məlumat Şöbə Müdirinə və Təsərrüfat şöbəsinə yönləndiriləcəkdir.</p>
+                        </div>
+                        <form id="report-issue-form">
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="report-equip-select">Nasaz Avadanlığı Seçin *</label>
+                                    <select id="report-equip-select" required>
+                                        <option value="" disabled selected>Avadanlığı seçin...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="report-status-select">Yeni Status Təklifi *</label>
+                                    <select id="report-status-select" required>
+                                        <option value="Xarab" selected>Xarab (İşləmir)</option>
+                                        <option value="Təmirdə">Təmirdə (IT baxışı lazımdır)</option>
+                                        <option value="İşlək">İşlək (Problem aradan qaldırıldı)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group full-width">
+                                    <label for="report-problem-desc">Nasazlığın Təsviri *</label>
+                                    <textarea id="report-problem-desc" required placeholder="Məs: Kompüter açılmır, göy ekran verir / Printer kağızı çeynəyir..."></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="submit-btn" style="background:#d97706;"><i class="fas fa-paper-plane"></i> Müraciəti Göndər</button>
+                        </form>
+                    </section>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL: DETALLI BAXIŞ -->
+    <div id="item-details-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 520px;">
+            <button class="modal-close-btn" id="item-details-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 data-key="equipmentDetails">Avadanlıq Məlumatları</h2></div>
+            <div class="modal-body">
+                <div class="details-grid" id="item-details-content"></div>
+                <div id="item-image-container" style="margin-top:12px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="submit-btn" id="item-details-ok" style="margin-top:0; width:auto;" data-key="okBtn">Oldu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: QR KOD -->
+    <div id="qr-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 360px; text-align: center;">
+            <button class="modal-close-btn" onclick="document.getElementById('qr-modal').style.display='none'"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2><i class="fas fa-qrcode"></i> QR Kod</h2></div>
+            <div class="modal-body" style="display: flex; flex-direction: column; align-items: center;">
+                <div id="qrcode" class="qr-code-section"></div>
+                <button type="button" class="submit-btn" onclick="downloadQR()" style="margin-top: 15px; width: 100%; background:#059669;">
+                    <i class="fas fa-download"></i> QR Kodu Yüklə (PNG)
+                </button>
+                <p id="qr-link-text" style="font-size:11px; word-break:break-all; color:#94a3b8; margin-top:8px;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PROFİL & ŞİFRƏ -->
+    <div id="profile-modal" class="modal-overlay">
+        <div class="modal-content profile-modal">
+            <button class="modal-close-btn" id="profile-modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-header"><h2 data-key="profileSettings">Profil Parametrləri</h2></div>
+            <form id="profile-settings-form">
+                <div class="modal-body">
+                    <div class="profile-pic-wrapper">
+                        <div class="profile-pic" style="background:#059669;" id="profile-pic-modal">ƏM</div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:12px;"><label data-key="fullNameLabel">Tam ad</label><input type="text" id="profile-name" required></div>
+                    <div class="form-group" style="margin-bottom:12px;"><label data-key="emailLabel">E-poçt ünvanı</label><input type="email" id="profile-email" disabled></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="action-btn" id="profile-cancel-btn" data-key="cancel">Ləğv et</button>
+                    <button type="submit" class="submit-btn" style="margin-top:0; width:auto; background:#059669;" data-key="updateProfile">Yadda Saxla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <!-- Modul Skriptlər -->
+    <script src="firebase-config.js"></script>
+    <script src="i18n.js"></script>
+    <script src="user-app.js"></script>
+</body>
+</html>

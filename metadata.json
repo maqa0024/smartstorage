@@ -1,0 +1,6 @@
+{
+  "name": "SmartStorage",
+  "description": "SmartStorage İnventar İdarəetmə Sistemi - Təsərrüfat Müdiri, Şöbə Müdiri və Sıravi İşçi panelləri və 3-rollu idarəetmə arxitekturası.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
