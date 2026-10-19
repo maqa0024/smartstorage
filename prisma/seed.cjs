@@ -1,4 +1,6 @@
+require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
@@ -26,29 +28,21 @@ const users = [
   },
 ];
 
-// Əvvəlki versiyalardan qala bilən köhnə email-lər
-const oldEmails = [
-  'mahammadli@qu.edu.az',
-  'a.gasimova@qu.edu.az',
-  'gabilzade@qu.edu.az',
-];
-
 async function main() {
-  const removedTests = await prisma.user.deleteMany({
-    where: { email: { startsWith: 'test-', endsWith: '@example.com' } },
-  });
-  const removedOld = await prisma.user.deleteMany({
-    where: { email: { in: oldEmails } },
-  });
-  console.log(`Silindi: ${removedTests.count} test, ${removedOld.count} köhnə istifadəçi`);
+  const password = process.env.SEED_PASSWORD;
+  if (!password) {
+    throw new Error('SEED_PASSWORD .env faylında tapılmadı');
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
 
   for (const u of users) {
     const saved = await prisma.user.upsert({
       where: { email: u.email },
-      update: { ...u, isVerified: true },
-      create: { ...u, isVerified: true },
+      update: { ...u, isVerified: true, passwordHash },
+      create: { ...u, isVerified: true, passwordHash },
     });
-    console.log(`✅ ${saved.role}: ${saved.email} (${saved.fullName})`);
+    console.log(`✅ ${saved.role}: ${saved.email} (parol təyin olundu)`);
   }
 
   const total = await prisma.user.count();
