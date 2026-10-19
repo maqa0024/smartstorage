@@ -13,13 +13,23 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+enum Role {
+  ADMIN
+  MANAGER
+  STAFF
+}
+
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  isVerified  Boolean  @default(false) @map("is_verified")
-  passwordHash String? @map("password_hash")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  email        String   @unique
+  fullName     String?  @map("full_name")
+  role         Role     @default(STAFF)
+  faculty      String?
+  department   String?
+  isVerified   Boolean  @default(false) @map("is_verified")
+  passwordHash String?  @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   userDevices UserDevice[]
   otpCodes    OtpCode[]
